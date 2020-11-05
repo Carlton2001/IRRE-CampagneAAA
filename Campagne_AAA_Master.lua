@@ -51,36 +51,27 @@ SAM.Blue.Turkey = {}
 SAM.Red.Lebanon = {}
 SAM.Red.Syria   = {}
 
-SAM.Blue.Israel.HatzorHaglilit_Patriot  = GROUP:FindByName("SAM_Blue_Israel_HatzorHaglilit_Patriot"):Activate()
-SAM.Blue.Israel.Tuberias_Patriot        = GROUP:FindByName("SAM_Blue_Israel_Tuberias_Patriot"):Activate()
-SAM.Blue.Syria.AbuAlDuhur_Hawk          = GROUP:FindByName("SAM_Blue_Syria_AbuAlDuhur_Hawk"):Activate()
-SAM.Blue.Syria.EinElkorum_S300          = GROUP:FindByName("SAM_Blue_Syria_EinElkorum_S300"):Activate()
-SAM.Blue.Syria.Idlib_Hawk               = GROUP:FindByName("SAM_Blue_Syria_Idlib_Hawk"):Activate()
-SAM.Blue.Syria.KuweiresJirah_Hawk       = GROUP:FindByName("SAM_Blue_Syria_KuweiresJirah_Hawk"):Activate()
-SAM.Blue.Syria.Minakh_S300              = GROUP:FindByName("SAM_Blue_Syria_Minakh_S300"):Activate()
-SAM.Blue.Syria.Palmyra_Hawk             = GROUP:FindByName("SAM_Blue_Syria_Palmyra_Hawk"):Activate()
-SAM.Blue.Syria.Raqqa_Hawk               = GROUP:FindByName("SAM_Blue_Syria_Raqqa_Hawk"):Activate()
-SAM.Blue.Syria.Tabqa_S300               = GROUP:FindByName("SAM_Blue_Syria_Tabqa_S300"):Activate()
-SAM.Blue.Turkey.CB22_S300               = GROUP:FindByName("SAM_Blue_Turkey_CB22_S300"):Activate()
-SAM.Blue.Turkey.DB30_S300               = GROUP:FindByName("SAM_Blue_Turkey_DB30_S300"):Activate()
-SAM.Blue.Turkey.IF25_S300               = GROUP:FindByName("SAM_Blue_Turkey_IF25_S300"):Activate()
-SAM.Red.Lebanon.Beirut_S300             = GROUP:FindByName("SAM_Red_Lebanon_Beirut_S300"):Activate()
-SAM.Red.Lebanon.Tripoli_S300            = GROUP:FindByName("SAM_Red_Lebanon_Tripoli_S300"):Activate()
-SAM.Red.Syria.AnNasiriyah_S300          = GROUP:FindByName("SAM_Red_Syria_AnNasiriyah_S300"):Activate()
-SAM.Red.Syria.AsSanamayn_S300           = GROUP:FindByName("SAM_Red_Syria_AsSanamayn_S300"):Activate()
-SAM.Red.Syria.Homs_Hawk                 = GROUP:FindByName("SAM_Red_Syria_Homs_Hawk"):Activate()
-SAM.Red.Syria.Mezzeh_S300               = GROUP:FindByName("SAM_Red_Syria_Mezzeh_S300"):Activate()
+SAM.Blue.Israel.Haifa_Patriot   = GROUP:FindByName("SAM_Blue_Israel_Haifa_Patriot"):Activate()
+SAM.Blue.Israel.Megiddo_Patriot = GROUP:FindByName("SAM_Blue_Israel_Megiddo_Patriot"):Activate()
+SAM.Blue.Syria.Idlib_Hawk       = GROUP:FindByName("SAM_Blue_Syria_Idlib_Hawk"):Activate()
+SAM.Blue.Syria.Hama_Hawk        = GROUP:FindByName("SAM_Blue_Syria_Hama_Hawk"):Activate()
+SAM.Blue.Syria.Aleppo_S300      = GROUP:FindByName("SAM_Blue_Syria_Aleppo_S300"):Activate()
+SAM.Blue.Syria.Palmyra_Hawk     = GROUP:FindByName("SAM_Blue_Syria_Palmyra_Hawk"):Activate()
+SAM.Blue.Syria.Tabqa_S300       = GROUP:FindByName("SAM_Blue_Syria_Tabqa_S300"):Activate()
+SAM.Blue.Turkey.CB22_S300       = GROUP:FindByName("SAM_Blue_Turkey_CB22_S300"):Activate()
+SAM.Blue.Turkey.DB30_S300       = GROUP:FindByName("SAM_Blue_Turkey_DB30_S300"):Activate()
+SAM.Blue.Turkey.IF25_S300       = GROUP:FindByName("SAM_Blue_Turkey_IF25_S300"):Activate()
+SAM.Red.Syria.AlQusayr_Hawk     = GROUP:FindByName("SAM_Red_Syria_AlQusayr_Hawk"):Activate()
+SAM.Red.Syria.Damascus_S300     = GROUP:FindByName("SAM_Red_Syria_Damascus_S300"):Activate()
+SAM.Red.Lebanon.Beirut_Hawk       = GROUP:FindByName("SAM_Red_Lebanon_Beirut_Hawk"):Activate()
 
 -- SAM Zones
 
 local SAMzone = {}
 
-if SAM.Red.Lebanon.Beirut_S300 then SAMzone.Beirut_S300 = ZONE_GROUP:New("Zone_Beirut_S300", SAM.Red.Lebanon.Beirut_S300, DangerZone.S300) end
-if SAM.Red.Lebanon.Tripoli_S300 then SAMzone.Tripoli_S300 = ZONE_GROUP:New("Zone_Tripoli_S300", SAM.Red.Lebanon.Tripoli_S300, DangerZone.S300) end
-if SAM.Red.Syria.AnNasiriyah_S300 then SAMzone.AnNasiriyah_S300 = ZONE_GROUP:New("Zone_AnNasiriyah_S300", SAM.Red.Syria.AnNasiriyah_S300, DangerZone.S300) end
-if SAM.Red.Syria.AsSanamayn_S300 then SAMzone.AsSanamayn_S300 = ZONE_GROUP:New("Zone_AsSanamayn_S300", SAM.Red.Syria.AsSanamayn_S300, DangerZone.S300) end
-if SAM.Red.Syria.Homs_Hawk then SAMzone.Homs_Hawk = ZONE_GROUP:New("Zone_Homs_Hawk", SAM.Red.Syria.Homs_Hawk, DangerZone.Hawk) end
-if SAM.Red.Syria.Mezzeh_S300 then SAMzone.Mezzeh_S300 = ZONE_GROUP:New("Zone_Mezzeh_S300", SAM.Red.Syria.Mezzeh_S300, DangerZone.S300) end
+if SAM.Red.Syria.AlQusayr_Hawk then SAMzone.AlQusayr_Hawk = ZONE_GROUP:New("Zone_AlQusayr_Hawk", SAM.Red.Syria.AlQusayr_Hawk, DangerZone.Hawk) end
+if SAM.Red.Syria.Damascus_S300 then SAMzone.Damascus_S300 = ZONE_GROUP:New("Zone_Damascus_S300", SAM.Red.Syria.Damascus_S300, DangerZone.S300) end
+if SAM.Red.Lebanon.Beirut_Hawk then SAMzone.Beirut_Hawk = ZONE_GROUP:New("Zone_Beirut_Hawk", SAM.Red.Lebanon.Beirut_Hawk, DangerZone.Hawk) end
 
 -- NAVAL Groups
 
@@ -138,8 +129,8 @@ SchedulerBorderDefense = SCHEDULER:New( nil,
         end
 
         if AIR.Red:CountAlive() >= 1 then
-            BlueSamBorderDefense(SAM.Blue.Israel.HatzorHaglilit_Patriot, BORDER.Blue.Israel, AIR.Red)
-            BlueSamBorderDefense(SAM.Blue.Israel.Tuberias_Patriot, BORDER.Blue.Israel, AIR.Red)
+            BlueSamBorderDefense(SAM.Blue.Israel.Haifa_Patriot, BORDER.Blue.Israel, AIR.Red)
+            BlueSamBorderDefense(SAM.Blue.Israel.Megiddo_Patriot, BORDER.Blue.Israel, AIR.Red)
             BlueSamBorderDefense(SAM.Blue.Turkey.CB22_S300, BORDER.Blue.Turkey, AIR.Red)
             BlueSamBorderDefense(SAM.Blue.Turkey.DB30_S300, BORDER.Blue.Turkey, AIR.Red)
             BlueSamBorderDefense(SAM.Blue.Turkey.IF25_S300, BORDER.Blue.Turkey, AIR.Red)
@@ -161,12 +152,9 @@ SchedulerBorderDefense = SCHEDULER:New( nil,
         end
 
         if AIR.Blue.All:CountAlive() >= 1 then
-            RedSamBorderDefense(SAM.Red.Lebanon.Beirut_S300, SAMzone.Beirut_S300)
-            RedSamBorderDefense(SAM.Red.Lebanon.Tripoli_S300, SAMzone.Tripoli_S300)
-            RedSamBorderDefense(SAM.Red.Syria.AnNasiriyah_S300, SAMzone.AnNasiriyah_S300)
-            RedSamBorderDefense(SAM.Red.Syria.AsSanamayn_S300, SAMzone.AsSanamayn_S300)
-            RedSamBorderDefense(SAM.Red.Syria.Homs_Hawk, SAMzone.Homs_Hawk)
-            RedSamBorderDefense(SAM.Red.Syria.Mezzeh_S300, SAMzone.Mezzeh_S300)
+            RedSamBorderDefense(SAM.Red.Syria.AlQusayr_Hawk, SAMzone.AlQusayr_Hawk)
+            RedSamBorderDefense(SAM.Red.Syria.Damascus_S300, SAMzone.Damascus_S300)
+            RedSamBorderDefense(SAM.Red.Lebanon.Beirut_Hawk, SAMzone.Beirut_Hawk)
         end
 
 	end, {}, 1, 10
