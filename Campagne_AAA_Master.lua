@@ -10,7 +10,11 @@ RAT.ATCswitch = false
 -- Inits
 
 EnvProd = false
-if EnvProd == false then MessageToAll("DEVELOPPEMENT", 120) end
+
+if EnvProd == false then
+    MessageToAll("DEVELOPPEMENT", 120)
+    TacticalDisplay = true
+end
 
 local DangerZone = {}
 DangerZone.S300 = 125000
@@ -29,7 +33,7 @@ BORDER.Red              = ZONE_POLYGON:New("BORDER_Red", GROUP:FindByName("BORDE
 BORDER.Blue.Israel      = ZONE_POLYGON:New("BORDER_Blue_Israel", GROUP:FindByName("BORDER_Blue_Israel"))
 BORDER.Blue.Syria       = ZONE_POLYGON:New("BORDER_Blue_Syria", GROUP:FindByName("BORDER_Blue_Syria"))
 BORDER.Blue.Turkey      = ZONE_POLYGON:New("BORDER_Blue_Turkey", GROUP:FindByName("BORDER_Blue_Turkey"))
-BORDER.Blue.OTAN_Fleet  = ZONE_POLYGON:New("BORDER_Blue_OTAN_Fleet", GROUP:FindByName("BORDER_Blue_OTAN_Fleet"))
+BORDER.Blue.OTAN        = ZONE_POLYGON:New("BORDER_Blue_OTAN", GROUP:FindByName("BORDER_Blue_OTAN"))
 
 -- Border Smoke pour rigoler
 if EnvProd == false then
@@ -37,7 +41,7 @@ if EnvProd == false then
     BORDER.Blue.Israel:SmokeZone(SMOKECOLOR.Blue)
     BORDER.Blue.Syria:SmokeZone(SMOKECOLOR.Blue)
     BORDER.Blue.Turkey:SmokeZone(SMOKECOLOR.Blue)
-    BORDER.Blue.OTAN_Fleet:SmokeZone(SMOKECOLOR.Blue)
+    BORDER.Blue.OTAN:SmokeZone(SMOKECOLOR.Blue)
 end
 
 -- SAM Groups / Commenter un site SAM pour le désactiver
@@ -63,7 +67,7 @@ SAM.Blue.Turkey.DB30_S300       = GROUP:FindByName("SAM_Blue_Turkey_DB30_S300"):
 SAM.Blue.Turkey.IF25_S300       = GROUP:FindByName("SAM_Blue_Turkey_IF25_S300"):Activate()
 SAM.Red.Syria.AlQusayr_Hawk     = GROUP:FindByName("SAM_Red_Syria_AlQusayr_Hawk"):Activate()
 SAM.Red.Syria.Damascus_S300     = GROUP:FindByName("SAM_Red_Syria_Damascus_S300"):Activate()
-SAM.Red.Lebanon.Beirut_Hawk       = GROUP:FindByName("SAM_Red_Lebanon_Beirut_Hawk"):Activate()
+SAM.Red.Lebanon.Beirut_Hawk     = GROUP:FindByName("SAM_Red_Lebanon_Beirut_Hawk"):Activate()
 
 -- SAM Zones
 
@@ -79,7 +83,7 @@ local NAVAL = {}
 NAVAL.Blue  = {}
 NAVAL.Red   = {}
 
-NAVAL.Blue.Cyprus_FlotteOTAN = GROUP:FindByName("NAVAL_Blue_Cyprus_FlotteOTAN"):Activate()
+NAVAL.Blue.Cyprus_OTAN = GROUP:FindByName("NAVAL_Blue_Cyprus_OTAN"):Activate()
 
 -- Air Groups
 
@@ -90,6 +94,16 @@ AIR.Red                 = SET_GROUP:New():FilterCoalitions("red"):FilterCategory
 AIR.Blue.All            = SET_GROUP:New():FilterCoalitions("blue"):FilterCategoryAirplane():FilterStart()
 AIR.Blue.IsraelOTAN     = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(Country.IsraelOTAN):FilterCategoryAirplane():FilterStart()
 AIR.Blue.IsisOpposition = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(Country.IsisOpposition):FilterCategoryAirplane():FilterStart()
+
+-- GCI Detection Sets
+
+local EWR = {}
+
+EWR.Red             = SET_GROUP:New():FilterPrefixes({"SAM_Red"}):FilterStart()
+EWR.Israel          = SET_GROUP:New():FilterPrefixes({"SAM_Blue_Israel"}):FilterStart()
+EWR.OTAN            = SET_GROUP:New():FilterPrefixes({"NAVAL_Blue_Cyprus_OTAN"}):FilterStart()
+EWR.Turkey          = SET_GROUP:New():FilterPrefixes({"SAM_Blue_Turkey"}):FilterStart()
+EWR.IsisOpposition  = SET_GROUP:New():FilterPrefixes({"SAM_Blue_Syria"}):FilterStart()
 
 ---------------------------------------------------------------------------------------------------
 -- BORDER SAM LOGIC
@@ -134,7 +148,7 @@ SchedulerBorderDefense = SCHEDULER:New( nil,
             BlueSamBorderDefense(SAM.Blue.Turkey.CB22_S300, BORDER.Blue.Turkey, AIR.Red)
             BlueSamBorderDefense(SAM.Blue.Turkey.DB30_S300, BORDER.Blue.Turkey, AIR.Red)
             BlueSamBorderDefense(SAM.Blue.Turkey.IF25_S300, BORDER.Blue.Turkey, AIR.Red)
-            BlueSamBorderDefense(NAVAL.Blue.Cyprus_FlotteOTAN, BORDER.Blue.OTAN_Fleet, AIR.Red)
+            BlueSamBorderDefense(NAVAL.Blue.Cyprus_OTAN, BORDER.Blue.OTAN, AIR.Red)
         end
 
         -- BORDER Reds
@@ -159,3 +173,27 @@ SchedulerBorderDefense = SCHEDULER:New( nil,
 
 	end, {}, 1, 10
 )
+
+---------------------------------------------------------------------------------------------------
+-- BORDER CAP GCI LOGIC
+---------------------------------------------------------------------------------------------------
+
+-- ISRAEL
+
+ZoneCAPIsrael = ZONE:New("ZONE_CAP_Israel")
+EWR.Israel = SET_GROUP:New():FilterPrefixes({"SAM_Blue_Israel"}):FilterStart()
+DetectionIsrael = DETECTION_AREAS:New(EWR.Israel, 150000)
+
+A2ADispatcherIsrael = AI_A2A_DISPATCHER:New(DetectionIsrael)
+
+    A2ADispatcherIsrael:SetBorderZone({BORDER.Blue.Israel})
+    A2ADispatcherIsrael:SetDefaultFuelThreshold(0.4)
+    A2ADispatcherIsrael:SetDefaultTanker("TANKER_Blue_Israel_GCI")
+    A2ADispatcherIsrael:SetTacticalDisplay(TacticalDisplay)
+
+    A2ADispatcherIsrael:SetSquadron("Ramat David CAP1", AIRBASE.Syria.Ramat_David, {"CAP_Blue_Israel_GCI"}, 2)
+    A2ADispatcherIsrael:SetSquadronCap("Ramat David CAP1", ZoneCAPIsrael, 8000, 10000, 600, 800, 1000, 2000)
+    A2ADispatcherIsrael:SetSquadronCapInterval("Ramat David CAP1", 1, 5, 10, 1)
+    A2ADispatcherIsrael:SetSquadronGrouping("Ramat David CAP1", 2)
+    A2ADispatcherIsrael:SetSquadronTakeoffInAir("Ramat David CAP1", 10000)
+    A2ADispatcherIsrael:SetSquadronGci("Ramat David CAP1", 1000, 2000)
