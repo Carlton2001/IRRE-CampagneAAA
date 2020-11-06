@@ -101,7 +101,7 @@ local EWR = {}
 
 EWR.Red             = SET_GROUP:New():FilterPrefixes({"SAM_Red"}):FilterStart()
 EWR.Israel          = SET_GROUP:New():FilterPrefixes({"SAM_Blue_Israel"}):FilterStart()
-EWR.OTAN            = SET_GROUP:New():FilterPrefixes({"NAVAL_Blue_Cyprus_OTAN"}):FilterStart()
+EWR.OTAN            = SET_GROUP:New():FilterPrefixes({"NAVAL_Blue_Cyprus_OTAN", "AWACS_Blue_OTAN"}):FilterStart()
 EWR.Turkey          = SET_GROUP:New():FilterPrefixes({"SAM_Blue_Turkey"}):FilterStart()
 EWR.IsisOpposition  = SET_GROUP:New():FilterPrefixes({"SAM_Blue_Syria"}):FilterStart()
 
@@ -180,20 +180,81 @@ SchedulerBorderDefense = SCHEDULER:New( nil,
 
 -- ISRAEL
 
-ZoneCAPIsrael = ZONE:New("ZONE_CAP_Israel")
-EWR.Israel = SET_GROUP:New():FilterPrefixes({"SAM_Blue_Israel"}):FilterStart()
-DetectionIsrael = DETECTION_AREAS:New(EWR.Israel, 150000)
+    ZoneCAPIsrael = ZONE_POLYGON:New("WPT_CAP_Israel", GROUP:FindByName("WPT_CAP_Israel"))
+    DetectionIsrael = DETECTION_AREAS:New(EWR.Israel, 150000)
 
-A2ADispatcherIsrael = AI_A2A_DISPATCHER:New(DetectionIsrael)
+    -- CAP/GCI Israel
+
+    A2ADispatcherIsrael = AI_A2A_DISPATCHER:New(DetectionIsrael)
 
     A2ADispatcherIsrael:SetBorderZone({BORDER.Blue.Israel})
     A2ADispatcherIsrael:SetDefaultFuelThreshold(0.4)
-    A2ADispatcherIsrael:SetDefaultTanker("TANKER_Blue_Israel_GCI")
+    A2ADispatcherIsrael:SetDefaultGrouping(2)
+    A2ADispatcherIsrael:SetDefaultOverhead(2)
+    A2ADispatcherIsrael:SetDefaultLandingAtRunway()
     A2ADispatcherIsrael:SetTacticalDisplay(TacticalDisplay)
+    -- CAP
+    A2ADispatcherIsrael:SetSquadron("Ramat David CAP", AIRBASE.Syria.Ramat_David, {"CAP_Blue_Israel"}, 4)
+    A2ADispatcherIsrael:SetSquadronTakeoffFromRunway("Ramat David CAP")
+    --A2ADispatcherIsrael:SetSquadronCap("Ramat David CAP", ZoneCAPIsrael, 2000, 10000, 50, 400, 1000, 2000)
+    A2ADispatcherIsrael:SetSquadronCap2("Ramat David CAP", 1000, 2000, 2000, 10000, "BARO", ZoneCAPIsrael, 600, 800, 4000, 8000, "RADIO")
+    A2ADispatcherIsrael:SetSquadronCapInterval("Ramat David CAP", 1, 60, 120, 1)
+    A2ADispatcherIsrael:SetSquadronGrouping("Ramat David CAP", 2)
+    A2ADispatcherIsrael:SetSquadronGci("Ramat David CAP", 1000, 2000)
+    -- GCI
+    A2ADispatcherIsrael:SetSquadron("Ramat David GCi", AIRBASE.Syria.Ramat_David, {"GCI_Blue_Israel"}, 2)
+    A2ADispatcherIsrael:SetSquadronTakeoffFromRunway("Ramat David GCi")
+    A2ADispatcherIsrael:SetSquadronGrouping("Ramat David GCi", 2)
+    A2ADispatcherIsrael:SetSquadronGci("Ramat David GCi", 1000, 2000)
 
-    A2ADispatcherIsrael:SetSquadron("Ramat David CAP1", AIRBASE.Syria.Ramat_David, {"CAP_Blue_Israel_GCI"}, 2)
-    A2ADispatcherIsrael:SetSquadronCap("Ramat David CAP1", ZoneCAPIsrael, 8000, 10000, 600, 800, 1000, 2000)
-    A2ADispatcherIsrael:SetSquadronCapInterval("Ramat David CAP1", 1, 5, 10, 1)
-    A2ADispatcherIsrael:SetSquadronGrouping("Ramat David CAP1", 2)
-    A2ADispatcherIsrael:SetSquadronTakeoffInAir("Ramat David CAP1", 10000)
-    A2ADispatcherIsrael:SetSquadronGci("Ramat David CAP1", 1000, 2000)
+-- OTAN
+
+    ZoneCAPOTAN = ZONE_POLYGON:New("WPT_CAP_OTAN", GROUP:FindByName("WPT_CAP_OTAN"))
+    DetectionOTAN = DETECTION_AREAS:New(EWR.OTAN, 150000)
+
+    -- AUFTRAG AWACS
+
+    local AuftragAWACSOTAN = AUFTRAG:NewAWACS(ZONE:New("ZONE_AWACS_OTAN"):GetCoordinate(), 35000, 350, 25, 20)
+    local AuftragAWACSOTANFG = FLIGHTGROUP:New("AWACS_Blue_OTAN")
+    AuftragAWACSOTANFG:AddMission(AuftragAWACSOTAN)
+
+    -- AUFTRAG Tanker
+
+    local AuftragTankerSOTAN = AUFTRAG:NewTANKER(ZONE:New("ZONE_Tanker_OTAN"):GetCoordinate(), 6000, 350, 25, 20)
+    AuftragTankerSOTAN:SetTime(30)
+    AuftragTankerSOTAN:SetRepeat(99)
+    local AuftragTankerSOTANFG = FLIGHTGROUP:New("TANKER_Blue_OTAN")
+    AuftragTankerSOTANFG:AddMission(AuftragTankerSOTAN)
+
+    -- CAP/GCI OTAN
+
+    A2ADispatcherOTAN = AI_A2A_DISPATCHER:New(DetectionOTAN)
+
+    A2ADispatcherOTAN:SetBorderZone({BORDER.Blue.OTAN})
+    A2ADispatcherOTAN:SetDefaultFuelThreshold(0.4)
+    A2ADispatcherOTAN:SetDefaultGrouping(2)
+    A2ADispatcherOTAN:SetDefaultOverhead(2)
+    A2ADispatcherOTAN:SetDefaultLandingAtRunway()
+    A2ADispatcherOTAN:SetDefaultTanker("TANKER_Blue_OTAN")
+    A2ADispatcherOTAN:SetTacticalDisplay(TacticalDisplay)
+    -- CAP 1
+    A2ADispatcherOTAN:SetSquadron("OTAN CAP1", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"CAP_Blue_OTAN"}, 4)
+    A2ADispatcherOTAN:SetSquadronTakeoffFromParkingHot("OTAN CAP1")
+    --A2ADispatcherOTAN:SetSquadronCap("OTAN CAP1", ZoneCAPOTAN, 2000, 10000, 50, 400, 1000, 2000)
+    A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP1", 1000, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 800, 4000, 8000, "RADIO")
+    A2ADispatcherOTAN:SetSquadronCapInterval("OTAN CAP1", 1, 60, 120, 1)
+    A2ADispatcherOTAN:SetSquadronGrouping("OTAN CAP1", 2)
+    A2ADispatcherOTAN:SetSquadronGci("OTAN CAP1", 1000, 2000)
+    -- CAP 2
+    A2ADispatcherOTAN:SetSquadron("OTAN CAP2", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"CAP_Blue_OTAN"}, 4)
+    A2ADispatcherOTAN:SetSquadronTakeoffFromParkingHot("OTAN CAP2")
+    --A2ADispatcherOTAN:SetSquadronCap("OTAN CAP2", ZoneCAPOTAN, 2000, 10000, 50, 400, 1000, 2000)
+    A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP2", 1000, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 800, 4000, 8000, "RADIO")
+    A2ADispatcherOTAN:SetSquadronCapInterval("OTAN CAP2", 1, 600, 660, 1)
+    A2ADispatcherOTAN:SetSquadronGrouping("OTAN CAP2", 2)
+    A2ADispatcherOTAN:SetSquadronGci("OTAN CAP2", 1000, 2000)
+    -- GCI
+    A2ADispatcherOTAN:SetSquadron("OTAN GCi", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"GCI_Blue_OTAN"}, 2)
+    A2ADispatcherOTAN:SetSquadronTakeoffFromParkingHot("OTAN GCi")
+    A2ADispatcherOTAN:SetSquadronGrouping("OTAN GCi", 2)
+    A2ADispatcherOTAN:SetSquadronGci("OTAN GCi", 1000, 2000)
