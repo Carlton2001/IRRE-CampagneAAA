@@ -24,6 +24,12 @@ local Country = {}
 Country.IsraelOTAN = {"USA", "ISRAEL"}
 Country.TurkeySyria = {"TURQEY", "CJTF_BLUE"}
 
+local RadioGeneral = 305.00
+
+local Tanker = {}
+Tanker.Boom = 0 -- perche
+Tanker.Probe = 1 -- panier
+
 -- Border Zones
 
 local BORDER    = {}
@@ -88,9 +94,11 @@ NAVAL.Blue.Cyprus_OTAN = GROUP:FindByName("NAVAL_Blue_Cyprus_OTAN"):Activate()
 -- Air Groups
 
 local AIR   = {}
+AIR.Red     = {}
 AIR.Blue    = {}
 
-AIR.Red                 = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterStart()
+AIR.Red.All             = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterStart()
+AIR.Red.GCICAP          = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterPrefixes{"CAP_Red", "GCI_Red"}:FilterStart()
 AIR.Blue.All            = SET_GROUP:New():FilterCoalitions("blue"):FilterCategoryAirplane():FilterStart()
 AIR.Blue.IsraelOTAN     = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(Country.IsraelOTAN):FilterCategoryAirplane():FilterStart()
 AIR.Blue.TurkeySyria    = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(Country.TurkeySyria):FilterCategoryAirplane():FilterStart()
@@ -142,13 +150,13 @@ SchedulerBorderDefenses = SCHEDULER:New( nil,
             end
         end
 
-        if AIR.Red:CountAlive() >= 1 then
-            BlueSamBorderDefense(SAM.Blue.Israel.Haifa_Patriot, BORDER.Blue.Israel, AIR.Red)
-            BlueSamBorderDefense(SAM.Blue.Israel.Megiddo_Patriot, BORDER.Blue.Israel, AIR.Red)
-            BlueSamBorderDefense(SAM.Blue.Turkey.CB22_S300, BORDER.Blue.Turkey, AIR.Red)
-            BlueSamBorderDefense(SAM.Blue.Turkey.DB30_S300, BORDER.Blue.Turkey, AIR.Red)
-            BlueSamBorderDefense(SAM.Blue.Turkey.IF25_S300, BORDER.Blue.Turkey, AIR.Red)
-            BlueSamBorderDefense(NAVAL.Blue.Cyprus_OTAN, BORDER.Blue.OTAN, AIR.Red)
+        if AIR.Red.All:CountAlive() >= 1 then
+            BlueSamBorderDefense(SAM.Blue.Israel.Haifa_Patriot, BORDER.Blue.Israel, AIR.Red.All)
+            BlueSamBorderDefense(SAM.Blue.Israel.Megiddo_Patriot, BORDER.Blue.Israel, AIR.Red.All)
+            BlueSamBorderDefense(SAM.Blue.Turkey.CB22_S300, BORDER.Blue.Turkey, AIR.Red.All)
+            BlueSamBorderDefense(SAM.Blue.Turkey.DB30_S300, BORDER.Blue.Turkey, AIR.Red.All)
+            BlueSamBorderDefense(SAM.Blue.Turkey.IF25_S300, BORDER.Blue.Turkey, AIR.Red.All)
+            BlueSamBorderDefense(NAVAL.Blue.Cyprus_OTAN, BORDER.Blue.OTAN, AIR.Red.All)
         end
 
         -- BORDER Reds
@@ -170,9 +178,50 @@ SchedulerBorderDefenses = SCHEDULER:New( nil,
             RedSamBorderDefense(SAM.Red.Syria.Damascus_S300, SAMzone.Damascus_S300)
             RedSamBorderDefense(SAM.Red.Lebanon.Beirut_Hawk, SAMzone.Beirut_Hawk)
         end
-
 	end, {}, 1, 10
 )
+
+---------------------------------------------------------------------------------------------------
+-- BREVITY RED GCICAP
+---------------------------------------------------------------------------------------------------
+
+function AIR.Red.GCICAP:OnAfterAdded(From, Event, To, ObjectName, Object)
+    local NewGroup = GROUP:FindByName(ObjectName)
+    NewGroup:HandleEvent(EVENTS.Shot)
+    function NewGroup:OnEventShot(EventData)
+        local Brevity = "none"
+        local WeaponDesc = EventData.Weapon:getDesc() -- https://wiki.hoggitworld.com/view/DCS_enum_weapon
+        if WeaponDesc.category == 3 then
+            Brevity = "Pickle"
+        elseif WeaponDesc.category == 1 then
+            if WeaponDesc.guidance == 1 then
+                if WeaponDesc.missileCategory == 4 then
+                    Brevity = "LongRifle"
+                elseif WeaponDesc.missileCategory == 6 then
+                    Brevity = "Rifle"
+                end
+            elseif WeaponDesc.guidance == 2 then
+                Brevity = "Fox2"
+            elseif WeaponDesc.guidance == 3 then
+                Brevity = "Fox3"
+            elseif WeaponDesc.guidance == 4 then
+                Brevity = "Fox1"
+            elseif WeaponDesc.guidance == 5 and WeaponDesc.missileCategory == 6 then
+                Brevity = "Magnum"
+            elseif WeaponDesc.guidance == 7 then
+                Brevity = "Rifle"
+            end
+        end
+        if Brevity ~= "none"  then
+            local BrevitySound = Brevity .. ".ogg"
+            local GroupRadio = NewGroup:GetRadio()
+            GroupRadio:SetFileName(BrevitySound)
+            GroupRadio:SetFrequency(RadioGeneral)
+            GroupRadio:SetModulation(radio.modulation.AM)
+            GroupRadio:Broadcast()
+        end
+    end
+end
 
 ---------------------------------------------------------------------------------------------------
 -- BORDER CAP/GCI LOGIC
@@ -341,10 +390,17 @@ SchedulerBorderDefenses = SCHEDULER:New( nil,
     -- AUFTRAG Tanker
 
     local AuftragTankerRed = AUFTRAG:NewTANKER(ZONE:New("ZONE_Tanker_Red"):GetCoordinate(), 20000, 350, 105, 20)
-    AuftragTankerRed:SetTime(30)
+    AuftragTankerRed:SetTime(10)
     AuftragTankerRed:SetRepeat(99)
     local AuftragTankerRedFG = FLIGHTGROUP:New("TANKER_Red_IL78")
+    --AuftragTankerRedFG:SetHomebase(AIRBASE:FindByName(AIRBASE.Syria.Damascus))
     AuftragTankerRedFG:AddMission(AuftragTankerRed)
+    function AuftragTankerRedFG:onafterSpawned(From, Event, To)
+        local AuftragEscortTankerRed = AUFTRAG:NewESCORT(AuftragTankerRedFG:GetGroup())
+        local AuftragEscortTankerRedFG = FLIGHTGROUP:New("Escort_Red")
+        --AuftragEscortTankerRedFG:SetHomebase(AIRBASE:FindByName(AIRBASE.Syria.Mezzeh))
+        AuftragEscortTankerRedFG:AddMission(AuftragEscortTankerRed)
+    end
 
     -- CAP/GCI Red
 
