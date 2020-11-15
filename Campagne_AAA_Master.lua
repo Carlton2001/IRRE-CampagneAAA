@@ -98,7 +98,7 @@
     AIR.Blue    = {}
 
     AIR.Red.All             = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterStart()
-    AIR.Red.GCICAP          = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterPrefixes{"CAP_Red", "GCI_Red"}:FilterStart()
+    AIR.Red.GCICAP          = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterPrefixes{"CAP_Red", "GCI_Red", "M01_Red_Su24"}:FilterStart()
     AIR.Blue.All            = SET_GROUP:New():FilterCoalitions("blue"):FilterCategoryAirplane():FilterStart()
     AIR.Blue.IsraelOTAN     = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(Country.IsraelOTAN):FilterCategoryAirplane():FilterStart()
     AIR.Blue.TurkeySyria    = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(Country.TurkeySyria):FilterCategoryAirplane():FilterStart()
@@ -461,11 +461,42 @@
 
     -- Target = "M01_Blue_ConvoiTrain"
 
-    function AuftragM01_AttackCamionsTrain ()
-        local bomber = GROUP:FindByName("M01_Red_Su24")
+    function Auftrag_M01_Red_AttackConvoi ()
+        local target = GROUP:FindByName("M01_Blue_Convoi"):GetCoordinate()
+        local bomber = FLIGHTGROUP:New("M01_Red_Su24")
+        bomber:AddWaypoint(ZONE:New("M01_Zone_M01_WPT1"):GetCoordinate(), nil, nil, 6500)
+        bomber:AddWaypoint(ZONE:New("M01_Zone_M01_WPT2"):GetCoordinate(), nil, nil, 6500)
+        bomber:SetDefaultFormation(ENUMS.Formation.FixedWing.EchelonRight.Close)
+
+        local auftrag = AUFTRAG:NewBOMBING(target)
+        auftrag:SetROT(ENUMS.ROT.NoReaction)
+        auftrag:SetWeaponExpend(AI.Task.WeaponExpend.ALL)
+        auftrag:SetWeaponType(ENUMS.WeaponFlag.AnyUnguided)
+        auftrag:SetMissionWaypointCoord(ZONE:New("M01_Zone_M01_IP"):GetCoordinate())
+        auftrag:SetMissionAltitude(3000)
+        auftrag:SetEngageAltitude(3000)
+        auftrag:SetMissionSpeed(350)
+
+        bomber:AddMission(auftrag)
         bomber:Activate()
+
+        function bomber:OnAfterPassingWaypoint(From, Event, To, Waypoint)
+            MessageToAll("Changement wAYPOINT !!", 10)
+            -- if n == 1 then
+            --     bomber:SwitchFormation(ENUMS.Formation.FixedWing.Trail.Close)
+            -- end
+        end
+        local data = bomber.waypoints
+        BASE:E(data)
+        function auftrag:OnAfterDone(From,Event,To)
+            for _,opsgroup in pairs(auftrag:GetOpsGroups()) do
+                local flightgroup = opsgroup --Ops.FlightGroup#FLIGHTGROUP
+                flightgroup:SwitchFormation(ENUMS.Formation.FixedWing.EchelonRight.Close)
+                flightgroup:RTB(AIRBASE:FindByName(AIRBASE.Syria.Mezzeh))
+            end
+        end
 
         --function bomber:onafterPassingWaypoint(From, Event, To, Waypoint)
     end
 
-    AuftragM01_AttackCamionsTrain()
+    Auftrag_M01_Red_AttackConvoi()
