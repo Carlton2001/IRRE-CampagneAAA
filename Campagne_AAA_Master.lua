@@ -98,7 +98,7 @@
     AIR.Blue    = {}
 
     AIR.Red.All             = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterStart()
-    AIR.Red.GCICAP          = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterPrefixes{"CAP_Red", "GCI_Red", "M01_Red_Su24"}:FilterStart()
+    AIR.Red.GCICAP          = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterPrefixes{"CAP_Red", "GCI_Red"}:FilterStart()
     AIR.Blue.All            = SET_GROUP:New():FilterCoalitions("blue"):FilterCategoryAirplane():FilterStart()
     AIR.Blue.IsraelOTAN     = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(Country.IsraelOTAN):FilterCategoryAirplane():FilterStart()
     AIR.Blue.TurkeySyria    = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(Country.TurkeySyria):FilterCategoryAirplane():FilterStart()
@@ -187,39 +187,45 @@
 
     function AIR.Red.GCICAP:OnAfterAdded (From, Event, To, ObjectName, Object)
         local NewGroup = GROUP:FindByName(ObjectName)
+        local Brevity = "none"
         NewGroup:HandleEvent(EVENTS.Shot)
+        NewGroup:HandleEvent(EVENTS.ShootingStart)
         function NewGroup:OnEventShot (EventData)
-            local Brevity = "none"
             local WeaponDesc = EventData.Weapon:getDesc() -- https://wiki.hoggitworld.com/view/DCS_enum_weapon
             if WeaponDesc.category == 3 then
-                Brevity = "Pickle_" .. math.random(2)
+                Brevity = "Pickle_" .. math.random(2) .. ".ogg"
             elseif WeaponDesc.category == 1 then
                 if WeaponDesc.guidance == 1 then
                     if WeaponDesc.missileCategory == 4 then
-                        Brevity = "LongRifle_" .. math.random(2)
+                        Brevity = "LongRifle_" .. math.random(2) .. ".ogg"
                     elseif WeaponDesc.missileCategory == 6 then
-                        Brevity = "Rifle_" .. math.random(2)
+                        Brevity = "Rifle_" .. math.random(2) .. ".ogg"
                     end
                 elseif WeaponDesc.guidance == 2 then
-                    Brevity = "Fox2_" .. math.random(2)
+                    Brevity = "Fox2_" .. math.random(2) .. ".ogg"
                 elseif WeaponDesc.guidance == 3 then
-                    Brevity = "Fox3_" .. math.random(2)
+                    Brevity = "Fox3_" .. math.random(2) .. ".ogg"
                 elseif WeaponDesc.guidance == 4 then
-                    Brevity = "Fox1_" .. math.random(2)
+                    Brevity = "Fox1_" .. math.random(2) .. ".ogg"
                 elseif WeaponDesc.guidance == 5 and WeaponDesc.missileCategory == 6 then
-                    Brevity = "Magnum_" .. math.random(2)
+                    Brevity = "Magnum_" .. math.random(2) .. ".ogg"
                 elseif WeaponDesc.guidance == 7 then
-                    Brevity = "Rifle_" .. math.random(2)
+                    Brevity = "Rifle_" .. math.random(2) .. ".ogg"
                 end
             end
-            if Brevity ~= "none"  then
-                local BrevitySound = Brevity .. ".ogg"
-                local GroupRadio = NewGroup:GetRadio()
-                GroupRadio:SetFileName(BrevitySound)
-                GroupRadio:SetFrequency(RadioGeneral)
-                GroupRadio:SetModulation(radio.modulation.AM)
-                GroupRadio:Broadcast()
-            end
+            return Brevity
+        end
+        function NewGroup:OnEventShootingStart (EventData)
+            MessageToAll("GunsGunsGuns")
+            -- Brevity = "Guns_" .. math.random(2)
+            -- return Brevity
+        end
+        if Brevity ~= "none"  then
+            local GroupRadio = NewGroup:GetRadio()
+            GroupRadio:SetFileName(Brevity)
+            GroupRadio:SetFrequency(RadioGeneral)
+            GroupRadio:SetModulation(radio.modulation.AM)
+            GroupRadio:Broadcast()
         end
     end
 
@@ -418,7 +424,7 @@
         A2ADispatcherRed:SetDefaultGrouping(2)
         A2ADispatcherRed:SetDefaultOverhead(2)
         A2ADispatcherRed:SetDefaultLandingAtRunway()
-        --A2ADispatcherRed:SetDefaultTanker("TANKER_Red_IL78")
+        -- BUG MOOSE #1366 A2ADispatcherRed:SetDefaultTanker("TANKER_Red_IL78")
         A2ADispatcherRed:SetTacticalDisplay(TacticalDisplay)
         -- CAP
         A2ADispatcherRed:SetSquadron("Red CAP", AIRBASE.Syria.An_Nasiriyah, {"CAP_Red"}, 4)
@@ -467,7 +473,7 @@
         bomber:AddWaypoint(ZONE:New("M01_Zone_M01_WPT1"):GetCoordinate(), nil, nil, 6500)
         bomber:AddWaypoint(ZONE:New("M01_Zone_M01_WPT2"):GetCoordinate(), nil, nil, 6500)
         bomber:SetDefaultFormation(ENUMS.Formation.FixedWing.EchelonRight.Close)
-
+        bomber:HandleEvent(EVENTS.Shot)
         local auftrag = AUFTRAG:NewBOMBING(target)
         auftrag:SetROT(ENUMS.ROT.NoReaction)
         auftrag:SetWeaponExpend(AI.Task.WeaponExpend.ALL)
@@ -476,27 +482,55 @@
         auftrag:SetMissionAltitude(3000)
         auftrag:SetEngageAltitude(3000)
         auftrag:SetMissionSpeed(350)
-
         bomber:AddMission(auftrag)
         bomber:Activate()
 
-        function bomber:OnAfterPassingWaypoint(From, Event, To, Waypoint)
-            MessageToAll("Changement wAYPOINT !!", 10)
-            -- if n == 1 then
-            --     bomber:SwitchFormation(ENUMS.Formation.FixedWing.Trail.Close)
-            -- end
+        -- BUG MOOSE #1365
+        -- SET_UNIT:New():FilterPrefixes("M01_Red_Su24"):FilterStart():FilterStop():ForEachUnit(
+        --     function (unit)
+        --         unit:HandleEvent(EVENTS.Shot)
+        --         unit:UnHandleEvent(EVENTS.Shot)
+        --         function unit:OnEventShot (EventData)
+        --             local WeaponDesc = EventData.Weapon:getDesc()
+        --             if WeaponDesc.category == 3 then
+        --                 MessageToAll("Pickle !")
+        --                 local BrevitySound = "Pickle_" .. math.random(2) .. ".ogg"
+        --                 local UnitRadio = UNIT:FindByName(unit:Name()):GetRadio()
+        --                 UnitRadio:SetFileName(BrevitySound)
+        --                 UnitRadio:SetFrequency(RadioGeneral)
+        --                 UnitRadio:SetModulation(radio.modulation.AM)
+        --                 UnitRadio:Broadcast()
+        --                 unit:UnHandleEvent(EVENTS.Shot)
+        --             end
+        --         end
+        --     end
+        -- )
+
+        function bomber:OnEventShot (EventData)
+            local WeaponDesc = EventData.Weapon:getDesc()
+            if WeaponDesc.category == 3 then
+                MessageToAll("Pickle !")
+                local BrevitySound = "Pickle_" .. math.random(2) .. ".ogg"
+                local GroupRadio = GROUP:FindByName("M01_Red_Su24"):GetRadio()
+                GroupRadio:SetFileName(BrevitySound)
+                GroupRadio:SetFrequency(RadioGeneral)
+                GroupRadio:SetModulation(radio.modulation.AM)
+                GroupRadio:Broadcast()
+                bomber:UnHandleEvent(EVENTS.Shot)
+            end
         end
-        local data = bomber.waypoints
-        BASE:E(data)
-        function auftrag:OnAfterDone(From,Event,To)
+
+        function bomber:OnAfterPassingWaypoint (From, Event, To, Waypoint)
+            if Waypoint.uid == 2 then bomber:SwitchFormation(ENUMS.Formation.FixedWing.Trail.Close) end
+        end
+
+        function auftrag:OnAfterDone (From,Event,To)
             for _,opsgroup in pairs(auftrag:GetOpsGroups()) do
                 local flightgroup = opsgroup --Ops.FlightGroup#FLIGHTGROUP
                 flightgroup:SwitchFormation(ENUMS.Formation.FixedWing.EchelonRight.Close)
                 flightgroup:RTB(AIRBASE:FindByName(AIRBASE.Syria.Mezzeh))
             end
         end
-
-        --function bomber:onafterPassingWaypoint(From, Event, To, Waypoint)
     end
 
     Auftrag_M01_Red_AttackConvoi()
