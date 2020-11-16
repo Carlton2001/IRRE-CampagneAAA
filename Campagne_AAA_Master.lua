@@ -130,9 +130,7 @@
         ■ Red SAMs
 
         Vs OTAN / ISRAEL
-        OpenFire ASAP
-
-    ]]--
+        OpenFire ASAP               ]]--
 
     SchedulerBorderDefenses = SCHEDULER:New( nil,
         function ()
@@ -224,13 +222,32 @@
         end
 
         function NewGroup:OnEventShootingStart (EventData)
-            local Brevity = "Guns_" .. math.random(2)
-            MessageToAll("GunsGunsGuns")
-            -- GroupRadio:SetFileName(Brevity)
-            -- GroupRadio:Broadcast()
+            local Brevity = "Guns_" .. math.random(2) .. ".ogg"
+            GroupRadio:SetFileName(Brevity)
+            GroupRadio:Broadcast()
         end
 
     end
+
+---------------------------------------------------------------------------------------------------
+-- PLUMES & FIRES
+---------------------------------------------------------------------------------------------------
+
+    local ZonesDestruction = SET_ZONE:New():FilterPrefixes("Zone_Destroy"):FilterStart():FilterStop():ForEachZone(
+        function (zone)
+            -- Smoke + Fire : 1,2,3,4 - Smoke : 5,6,7,8
+            local coords = zone:GetCoordinate()
+            if      string.match(zone.ZoneName, "SmallFireSmoke")   then coords:BigSmokeAndFire(1, 0.5)
+            elseif  string.match(zone.ZoneName, "MediumFireSmoke")  then coords:BigSmokeAndFire(2, 0.5)
+            elseif  string.match(zone.ZoneName, "LargeFireSmoke")   then coords:BigSmokeAndFire(3, 0.5)
+            elseif  string.match(zone.ZoneName, "HugeFireSmoke")    then coords:BigSmokeAndFire(4, 0.5)
+            elseif  string.match(zone.ZoneName, "SmallSmoke")       then coords:BigSmokeAndFire(5, 0.5)
+            elseif  string.match(zone.ZoneName, "MediumSmoke")      then coords:BigSmokeAndFire(6, 0.5)
+            elseif  string.match(zone.ZoneName, "LargeSmoke")       then coords:BigSmokeAndFire(7, 0.5)
+            elseif  string.match(zone.ZoneName, "HugeSmoke")        then coords:BigSmokeAndFire(8, 0.5)
+            end
+        end
+    )
 
 ---------------------------------------------------------------------------------------------------
 -- TANKER FUNCTIONS
@@ -409,32 +426,35 @@
         -- AUFTRAG Tanker
 
             -- AUFTRAG
-            local TankerRed = AUFTRAG:NewTANKER(ZONE:New("ZONE_Tanker_Red"):GetCoordinate(), 20000, 350, 105, 20)
-            TankerRed:SetTime(10)
-            TankerRed:SetRepeat(99)
+            local MissionTankerRed = AUFTRAG:NewTANKER(ZONE:New("ZONE_Tanker_Red"):GetCoordinate(), 20000, 350, 105, 20)
+            MissionTankerRed:SetTime(10)
+            MissionTankerRed:SetRepeat(99)
             --TankerRed:AddConditionSuccess(TankerSuccess, "TANKER_Red_IL78")
             -- FLIGHTGROUP TANKER
-            local TankerRedFG = FLIGHTGROUP:New("TANKER_Red_IL78"):AddMission(TankerRed)
-            TankerRedFG:SwitchRadio(260.00, radio.modulation.AM)
-            TankerRedFG:SetDefaultCallsign(CALLSIGN.Tanker.Arco, 1)
-            TankerRedFG:AddMission(TankerRed)
+            local TankerRed = FLIGHTGROUP:New("TANKER_Red_IL78")
+            TankerRed:SwitchRadio(260.00, radio.modulation.AM)
+            TankerRed:SetDefaultCallsign(CALLSIGN.Tanker.Arco, 1)
+            TankerRed:AddMission(MissionTankerRed)
 
             -- ESCORT TANKER
-            function TankerRedFG:onafterSpawned (From, Event, To)
+            function TankerRed:onafterSpawned (From, Event, To)
                 -- AUFTRAG ESCORT
-                local AuftragEscortTankerRed = AUFTRAG:NewESCORT(TankerRedFG:GetGroup(), nil, 30000) --{x=-100, y=0, z=200}
+                local MissionEscortTankerRed = AUFTRAG:NewESCORT(TankerRed:GetGroup(), nil, 30000):SetRepeat(99) --{x=-100, y=0, z=200}
                 -- FLIGHTGROUP ESCORT
-                local AuftragEscortTankerRedFG = FLIGHTGROUP:New("Escort_Red")
-                AuftragEscortTankerRedFG:SwitchRadio(RadioGeneral, radio.modulation.AM)
-                AuftragEscortTankerRedFG:SetDefaultCallsign(CALLSIGN.Aircraft.Pontiac, 3)
-                :SetDefaultFormation(ENUMS.Formation.FixedWing.FighterVic.Close)
-                AuftragEscortTankerRedFG:AddMission(AuftragEscortTankerRed)
+                local EscortTankerRed = FLIGHTGROUP:New("Escort_Red")
+                EscortTankerRed:SwitchRadio(RadioGeneral, radio.modulation.AM)
+                EscortTankerRed:SetDefaultCallsign(CALLSIGN.Aircraft.Pontiac, 3)
+                EscortTankerRed:SetDefaultFormation(ENUMS.Formation.FixedWing.FighterVic.Close)
+                --AuftragEscortTankerRedFG:SetFuelLowThreshold(98)
+                --EscortTankerRed:SetFuelLowRefuel(true)
+                EscortTankerRed:AddMission(MissionEscortTankerRed)
+
                 -- TANKER DUEL STATUS
                 --SchedulerTankerRed = SCHEDULER:New( nil, TankerFuelStatus, {"TANKER_Red_IL78", "Texaco", 198416, 0.2, 251.00}, 1, 10)
             end
 
-            function TankerRedFG:onafterFuelLow(From, Event, To)
-                TankerRedFG:__RTB(1, AIRBASE:FindByName(AIRBASE.Syria.Damascus))
+            function TankerRed:onafterFuelLow(From, Event, To)
+                TankerRed:__RTB(1, AIRBASE:FindByName(AIRBASE.Syria.Damascus))
             end
 
         -- CAP/GCI Red
@@ -472,23 +492,7 @@
 -- MISSION 01
 ---------------------------------------------------------------------------------------------------
 
-    -- Plumes & Fires
 
-        local ZonesDestruction = SET_ZONE:New():FilterPrefixes("M01_Zone_Destroy"):FilterStart():FilterStop():ForEachZone(
-            function (zone)
-                -- Smoke + Fire : 1,2,3,4 - Smoke : 5,6,7,8
-                local coords = zone:GetCoordinate()
-                if      string.match(zone.ZoneName, "SmallFireSmoke")   then coords:BigSmokeAndFire(1, 0.5)
-                elseif  string.match(zone.ZoneName, "MediumFireSmoke")  then coords:BigSmokeAndFire(2, 0.5)
-                elseif  string.match(zone.ZoneName, "LargeFireSmoke")   then coords:BigSmokeAndFire(3, 0.5)
-                elseif  string.match(zone.ZoneName, "HugeFireSmoke")    then coords:BigSmokeAndFire(4, 0.5)
-                elseif  string.match(zone.ZoneName, "SmallSmoke")       then coords:BigSmokeAndFire(5, 0.5)
-                elseif  string.match(zone.ZoneName, "MediumSmoke")      then coords:BigSmokeAndFire(6, 0.5)
-                elseif  string.match(zone.ZoneName, "LargeSmoke")       then coords:BigSmokeAndFire(7, 0.5)
-                elseif  string.match(zone.ZoneName, "HugeSmoke")        then coords:BigSmokeAndFire(8, 0.5)
-                end
-            end
-        )
 
     -- Vol Rouge Su-24
 
@@ -516,40 +520,25 @@
             bomber:AddMission(auftrag)
             bomber:Activate()
 
-            -- BUG MOOSE #1365
-            -- SET_UNIT:New():FilterPrefixes("M01_Red_Su24"):FilterStart():FilterStop():ForEachUnit(
-            --     function (unit)
-            --         unit:HandleEvent(EVENTS.Shot)
-            --         unit:UnHandleEvent(EVENTS.Shot)
-            --         function unit:OnEventShot (EventData)
-            --             local WeaponDesc = EventData.Weapon:getDesc()
-            --             if WeaponDesc.category == 3 then
-            --                 MessageToAll("Pickle !")
-            --                 local BrevitySound = "Pickle_" .. math.random(2) .. ".ogg"
-            --                 local UnitRadio = UNIT:FindByName(unit:Name()):GetRadio()
-            --                 UnitRadio:SetFileName(BrevitySound)
-            --                 UnitRadio:SetFrequency(RadioGeneral)
-            --                 UnitRadio:SetModulation(radio.modulation.AM)
-            --                 UnitRadio:Broadcast()
-            --                 unit:UnHandleEvent(EVENTS.Shot)
-            --             end
-            --         end
-            --     end
-            -- )
-
-            function bomber:OnEventShot (EventData)
-                local WeaponDesc = EventData.Weapon:getDesc()
-                if WeaponDesc.category == 3 then
-                    MessageToAll("Riple !")
-                    local BrevitySound = "Pickle_" .. math.random(2) .. ".ogg"
-                    local GroupRadio = GROUP:FindByName("M01_Red_Su24"):GetRadio()
-                    GroupRadio:SetFileName(BrevitySound)
-                    GroupRadio:SetFrequency(RadioGeneral)
-                    GroupRadio:SetModulation(radio.modulation.AM)
-                    GroupRadio:Broadcast()
-                    bomber:UnHandleEvent(EVENTS.Shot)
+            -- BREVITY Su-24
+            SET_UNIT:New():FilterPrefixes("M01_Red_Su24"):FilterStart():FilterStop():ForEachUnit(
+                function (unit)
+                    BASE:E(unit:GetName())
+                    unit:HandleEvent(EVENTS.Shot)
+                    function unit:OnEventShot (EventData)
+                        local WeaponDesc = EventData.Weapon:getDesc()
+                        if WeaponDesc.category == 3 then
+                            local Brevity = "Ripple_" .. math.random(2) .. ".ogg"
+                            local UnitRadio = unit:GetRadio()
+                            UnitRadio:SetFileName(Brevity)
+                            UnitRadio:SetFrequency(RadioGeneral)
+                            UnitRadio:SetModulation(radio.modulation.AM)
+                            UnitRadio:Broadcast()
+                            unit:UnHandleEvent(EVENTS.Shot)
+                        end
+                    end
                 end
-            end
+            )
 
             function bomber:OnAfterPassingWaypoint (From, Event, To, Waypoint)
                 if Waypoint.uid == 3 then bomber:SwitchFormation(ENUMS.Formation.FixedWing.Trail.Close) end
