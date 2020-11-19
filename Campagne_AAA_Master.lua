@@ -1,4 +1,26 @@
 ---------------------------------------------------------------------------------------------------
+-- MISSION CONSTANTES
+---------------------------------------------------------------------------------------------------
+
+    -- A désactiver en PROD
+
+    local EnvProd = true
+
+    -- Fréquence Radio - Attention Callsigns & Radios du EWR et des GCI/CAP à paramétrer dans l'EM
+
+    local RadioGeneral = 305.00
+    local RadioTanker1 = 260.00 -- Texaco
+    local RadioTanker2 = 265.00 -- Arco
+    local RadioTanker3 = 266.00 -- Shell
+
+    -- Provenances du vent
+
+    local WIND = {}
+    WIND.High   = 227   -- 26000 ft
+    WIND.Medium = 223   -- 6600 ft
+    WIND.Low    = 221   -- 1600 ft
+
+---------------------------------------------------------------------------------------------------
 -- INITIALISATIONS
 ---------------------------------------------------------------------------------------------------
 
@@ -9,22 +31,18 @@
 
     -- Inits
 
-    local EnvProd = false
-
     if EnvProd == false then
         MessageToAll("DEVELOPPEMENT", 120)
         TacticalDisplay = true
     end
 
-    local DangerZone = {}
-    DangerZone.S300 = 125000
-    DangerZone.Hawk = 50000
+    local DANGERZONE = {}
+    DANGERZONE.S300 = 125000
+    DANGERZONE.Hawk = 50000
 
-    local Country = {}
-    Country.IsraelOTAN = {"USA", "ISRAEL"}
-    Country.TurkeySyria = {"TURQEY", "CJTF_BLUE"}
-
-    local RadioGeneral = 305.00
+    local COUNTRY = {}
+    COUNTRY.IsraelOTAN = {"USA", "ISRAEL"}
+    COUNTRY.TurkeySyria = {"TURQEY", "CJTF_BLUE"}
 
     local TANKER = {} -- Type : perche = 0, panier = 1
     TANKER.IL78 = {}
@@ -33,16 +51,16 @@
     TANKER.KC135MPRS = {}
     TANKER.S3B = {}
 
-    TANKER.IL78.Type = 1
-    TANKER.IL78.Fuel = 198416
-    TANKER.KC130.Type = 1
-    TANKER.KC130.Fuel = 66139
-    TANKER.KC135.Type = 0
-    TANKER.KC135.Fuel = 199959
-    TANKER.KC135MPRS.Type = 1
-    TANKER.KC135MPRS.Fuel = 199959
-    TANKER.S3B.Type = 1
-    TANKER.S3B.Fuel = 17225    
+    TANKER.IL78.Type        = 1
+    TANKER.IL78.Fuel        = 198416
+    TANKER.KC130.Type       = 1
+    TANKER.KC130.Fuel       = 66139
+    TANKER.KC135.Type       = 0
+    TANKER.KC135.Fuel       = 199959
+    TANKER.KC135MPRS.Type   = 1
+    TANKER.KC135MPRS.Fuel   = 199959
+    TANKER.S3B.Type         = 1
+    TANKER.S3B.Fuel         = 17225
 
     -- Border Zones
 
@@ -93,9 +111,9 @@
 
     local SAMzone = {}
 
-    if SAM.Red.Syria.AlQusayr_Hawk then SAMzone.AlQusayr_Hawk = ZONE_GROUP:New("Zone_AlQusayr_Hawk", SAM.Red.Syria.AlQusayr_Hawk, DangerZone.Hawk) end
-    if SAM.Red.Syria.Damascus_S300 then SAMzone.Damascus_S300 = ZONE_GROUP:New("Zone_Damascus_S300", SAM.Red.Syria.Damascus_S300, DangerZone.S300) end
-    if SAM.Red.Lebanon.Beirut_Hawk then SAMzone.Beirut_Hawk = ZONE_GROUP:New("Zone_Beirut_Hawk", SAM.Red.Lebanon.Beirut_Hawk, DangerZone.Hawk) end
+    if SAM.Red.Syria.AlQusayr_Hawk then SAMzone.AlQusayr_Hawk = ZONE_GROUP:New("Zone_AlQusayr_Hawk", SAM.Red.Syria.AlQusayr_Hawk, DANGERZONE.Hawk) end
+    if SAM.Red.Syria.Damascus_S300 then SAMzone.Damascus_S300 = ZONE_GROUP:New("Zone_Damascus_S300", SAM.Red.Syria.Damascus_S300, DANGERZONE.S300) end
+    if SAM.Red.Lebanon.Beirut_Hawk then SAMzone.Beirut_Hawk = ZONE_GROUP:New("Zone_Beirut_Hawk", SAM.Red.Lebanon.Beirut_Hawk, DANGERZONE.Hawk) end
 
     -- NAVAL Groups
 
@@ -114,8 +132,8 @@
     AIR.Red.All             = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterStart()
     AIR.Red.GCICAP          = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterPrefixes{"CAP_Red", "GCI_Red"}:FilterStart()
     AIR.Blue.All            = SET_GROUP:New():FilterCoalitions("blue"):FilterCategoryAirplane():FilterStart()
-    AIR.Blue.IsraelOTAN     = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(Country.IsraelOTAN):FilterCategoryAirplane():FilterStart()
-    AIR.Blue.TurkeySyria    = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(Country.TurkeySyria):FilterCategoryAirplane():FilterStart()
+    AIR.Blue.IsraelOTAN     = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(COUNTRY.IsraelOTAN):FilterCategoryAirplane():FilterStart()
+    AIR.Blue.TurkeySyria    = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(COUNTRY.TurkeySyria):FilterCategoryAirplane():FilterStart()
 
     -- GCI Detection Sets
 
@@ -131,7 +149,7 @@
 -- BORDER SAM LOGIC
 ---------------------------------------------------------------------------------------------------
 
-    --[[
+    --[[ Rules
 
         ■ Blue SAMs
 
@@ -144,49 +162,50 @@
         RED Vs SYRIA/TURQUEY : OpenFire ASAP               ]]--
 
     -- BORDER Blues
-    local function BlueSamBorderDefense (sam, border, bandits)
-        -- Autorisation de tir pour les SAM/Naval Bleus en fonction de la présence de bandits à l'intérieur de la frontière
-        if sam then
-            if bandits:AnyInZone(border) then
-                if EnvProd == false then MessageToRed("DANGER ZONE", 2) end
-                sam:OptionROEOpenFire()
-            else
-                sam:OptionROEHoldFire()
+        local function BlueSamBorderDefense (sam, border, bandits)
+            -- Autorisation de tir pour les SAM/Naval Bleus en fonction de la présence de bandits à l'intérieur de la frontière
+            if sam then
+                if bandits:AnyInZone(border) then
+                    if EnvProd == false then MessageToRed("DANGER ZONE", 2) end
+                    sam:OptionROEOpenFire()
+                else
+                    sam:OptionROEHoldFire()
+                end
             end
         end
-    end
 
     -- BORDER Reds
-    local function RedSamBorderDefense (sam, zonesam)
-        -- Autorisation de tir pour les SAM rouges en fonction de la présence de bandits à l'intérieur de la frontière
-        -- ou de la nationalité des bandits à l'intérieur de la zone de tir du SAM
-        if sam then
-            if AIR.Blue.IsraelOTAN:AnyInZone(BORDER.Red) or AIR.Blue.TurkeySyria:AnyInZone(zonesam) then
-                if EnvProd == false then MessageToBlue("DANGER ZONE", 2) end
-                sam:OptionROEOpenFire()
-            else
-                sam:OptionROEHoldFire()
+        local function RedSamBorderDefense (sam, zonesam)
+            -- Autorisation de tir pour les SAM rouges en fonction de la présence de bandits à l'intérieur de la frontière
+            -- ou de la nationalité des bandits à l'intérieur de la zone de tir du SAM
+            if sam then
+                if AIR.Blue.IsraelOTAN:AnyInZone(BORDER.Red) or AIR.Blue.TurkeySyria:AnyInZone(zonesam) then
+                    if EnvProd == false then MessageToBlue("DANGER ZONE", 2) end
+                    sam:OptionROEOpenFire()
+                else
+                    sam:OptionROEHoldFire()
+                end
             end
         end
-    end
 
-    SchedulerBorderDefenses = SCHEDULER:New( nil,
-        function ()
-            if AIR.Red.All:CountAlive() >= 1 then
-                BlueSamBorderDefense (SAM.Blue.Israel.Haifa_Patriot, BORDER.Blue.Israel, AIR.Red.All)
-                BlueSamBorderDefense (SAM.Blue.Israel.Megiddo_Patriot, BORDER.Blue.Israel, AIR.Red.All)
-                BlueSamBorderDefense (SAM.Blue.Turkey.CB22_S300, BORDER.Blue.Turkey, AIR.Red.All)
-                BlueSamBorderDefense (SAM.Blue.Turkey.DB30_S300, BORDER.Blue.Turkey, AIR.Red.All)
-                BlueSamBorderDefense (SAM.Blue.Turkey.IF25_S300, BORDER.Blue.Turkey, AIR.Red.All)
-                BlueSamBorderDefense (NAVAL.Blue.Cyprus_OTAN, BORDER.Blue.OTAN, AIR.Red.All)
-            end
-            if AIR.Blue.All:CountAlive() >= 1 then
-                RedSamBorderDefense (SAM.Red.Syria.AlQusayr_Hawk, SAMzone.AlQusayr_Hawk)
-                RedSamBorderDefense (SAM.Red.Syria.Damascus_S300, SAMzone.Damascus_S300)
-                RedSamBorderDefense (SAM.Red.Lebanon.Beirut_Hawk, SAMzone.Beirut_Hawk)
-            end
-        end, {}, 1, 10
-    )
+    -- Scheduler
+        SchedulerBorderDefenses = SCHEDULER:New( nil,
+            function ()
+                if AIR.Red.All:CountAlive() >= 1 then
+                    BlueSamBorderDefense (SAM.Blue.Israel.Haifa_Patriot, BORDER.Blue.Israel, AIR.Red.All)
+                    BlueSamBorderDefense (SAM.Blue.Israel.Megiddo_Patriot, BORDER.Blue.Israel, AIR.Red.All)
+                    BlueSamBorderDefense (SAM.Blue.Turkey.CB22_S300, BORDER.Blue.Turkey, AIR.Red.All)
+                    BlueSamBorderDefense (SAM.Blue.Turkey.DB30_S300, BORDER.Blue.Turkey, AIR.Red.All)
+                    BlueSamBorderDefense (SAM.Blue.Turkey.IF25_S300, BORDER.Blue.Turkey, AIR.Red.All)
+                    BlueSamBorderDefense (NAVAL.Blue.Cyprus_OTAN, BORDER.Blue.OTAN, AIR.Red.All)
+                end
+                if AIR.Blue.All:CountAlive() >= 1 then
+                    RedSamBorderDefense (SAM.Red.Syria.AlQusayr_Hawk, SAMzone.AlQusayr_Hawk)
+                    RedSamBorderDefense (SAM.Red.Syria.Damascus_S300, SAMzone.Damascus_S300)
+                    RedSamBorderDefense (SAM.Red.Lebanon.Beirut_Hawk, SAMzone.Beirut_Hawk)
+                end
+            end, {}, 1, 10
+        )
 
 ---------------------------------------------------------------------------------------------------
 -- BREVITY RED GCICAP
@@ -331,7 +350,6 @@
         A2ADispatcherOTAN:SetDefaultGrouping(2)
         A2ADispatcherOTAN:SetDefaultOverhead(2)
         A2ADispatcherOTAN:SetDefaultLandingAtRunway()
-        --A2ADispatcherOTAN:SetDefaultTanker(TankerOTAN.tanker.GroupName)
         A2ADispatcherOTAN:SetTacticalDisplay(TacticalDisplay)
         -- CAP 1
         A2ADispatcherOTAN:SetSquadron("OTAN CAP1", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"CAP_Blue_OTAN"}, 4)
@@ -445,37 +463,6 @@
 
     -- RED
 
-        -- AUFTRAG Tanker
-
-            -- AUFTRAG
-            -- local MissionTankerRed = AUFTRAG:NewTANKER(ZONE:New("ZONE_Tanker_Red"):GetCoordinate(), 20000, 350, 105, 20)
-            -- MissionTankerRed:SetTime(10)
-            -- -- FLIGHTGROUP TANKER
-            -- local TankerRed = FLIGHTGROUP:New("TANKER_Red_IL78")
-            -- TankerRed:SetHomebase(AIRBASE:FindByName(AIRBASE.Syria.Damascus))
-            -- TankerRed:SwitchRadio(260.00, radio.modulation.AM)
-            -- TankerRed:SetDefaultCallsign(CALLSIGN.Tanker.Arco, 1)
-            -- TankerRed:SetFuelLowThreshold(10)
-            -- TankerRed:AddMission(MissionTankerRed)
-            -- function TankerRed:onafterSpawned (From, Event, To)
-
-            -- --     -- ESCORT TANKER (BUG MOOSE #1368)
-            -- --     -- AUFTRAG ESCORT
-            -- --     local MissionEscortTankerRed = AUFTRAG:NewESCORT(TankerRed:GetGroup(), nil, 30000) --{x=-100, y=0, z=200}
-            -- --     -- FLIGHTGROUP ESCORT
-            -- --     local EscortTankerRed = FLIGHTGROUP:New("Escort_Red")
-            -- --     EscortTankerRed:SwitchRadio(RadioGeneral, radio.modulation.AM)
-            -- --     EscortTankerRed:SetDefaultCallsign(CALLSIGN.Aircraft.Pontiac, 3)
-            -- --     EscortTankerRed:SetDefaultFormation(ENUMS.Formation.FixedWing.FighterVic.Close)
-            -- --     --AuftragEscortTankerRedFG:SetFuelLowThreshold(98)
-            -- --     --EscortTankerRed:SetFuelLowRefuel(true)
-            -- --     EscortTankerRed:AddMission(MissionEscortTankerRed)
-
-            --     -- TANKER DUEL STATUS
-            --     SchedulerTankerRed = SCHEDULER:New( nil, TankerFuelStatus, {"TANKER_Red_IL78", CALLSIGN.Tanker.Arco, 198416, 0.1, 260.00}, 1, 10)
-
-            -- end
-
         -- CAP/GCI Red
 
             -- Callsigns & Radios à paramétrer dans l'EM
@@ -487,7 +474,6 @@
             A2ADispatcherRed:SetDefaultGrouping(2)
             A2ADispatcherRed:SetDefaultOverhead(2)
             A2ADispatcherRed:SetDefaultLandingAtRunway()
-            -- BUG MOOSE #1366 A2ADispatcherRed:SetDefaultTanker("TANKER_Red_IL78")
             A2ADispatcherRed:SetTacticalDisplay(TacticalDisplay)
             -- CAP
             A2ADispatcherRed:SetSquadron("Red CAP", AIRBASE.Syria.An_Nasiriyah, {"CAP_Red"}, 4)
@@ -506,16 +492,32 @@
             A2ADispatcherRed:SetSquadronGrouping("Red GCIS", 2)
             A2ADispatcherRed:SetSquadronGci("Red GCIS", 1000, 2000)
 
-
 ---------------------------------------------------------------------------------------------------
 -- MISSION 01
 ---------------------------------------------------------------------------------------------------
 
+    -- RED EWR
+
+        function Spawn_EWR_Red ()
+            GROUP:FindByName("EWR_Red"):Activate()
+        end
+
     -- RED Tankers
 
         function Auftrag_M01_Red_Tankers ()
-            -- LaunchTanker (GroupName, ZoneName, PATTERN {Altitude (ft), Speed (kts), Heading, Leg (nm)}, TANKERTYPE, FuelLow (%), Radio, Callsign, HomeBase, DepartureTime (s), TACAN {Channel, Morse, Band})
-            LaunchTanker ("TANKER_Red_IL78", "ZONE_Tanker_Red", {["Altitude"] = 20000, ["Speed"] = 350, ["Heading"] = 105, ["Leg"] = 20}, TANKER.IL78, 10, 260.00, CALLSIGN.Tanker.Arco, AIRBASE.Syria.Damascus, 10, {["Channel"] = 11, ["Morse"] = "ARC", ["Band"] = "Y"})
+            -- Arco
+            LaunchTanker (
+                "TANKER_Red_IL78", -- GroupName
+                "ZONE_Tanker_Red", -- ZoneName
+                {["Altitude"] = 20000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
+                TANKER.IL78, -- TANKERTYPE
+                10, -- FuelLow (%)
+                RadioTanker2, -- Radio
+                CALLSIGN.Tanker.Arco, -- Callsign
+                AIRBASE.Syria.Damascus, -- HomeBase
+                10, -- DepartureTime (s)
+                {["Channel"] = 11, ["Morse"] = "ARC", ["Band"] = "Y"} -- TACAN
+            )
         end
 
     -- RED Su-24
@@ -578,5 +580,6 @@
 
     -- Executions
 
+        Spawn_EWR_Red ()
         Auftrag_M01_Red_Tankers ()
-        Auftrag_M01_Red_AttackConvoi()
+        Auftrag_M01_Red_AttackConvoi ()
