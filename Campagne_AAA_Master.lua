@@ -6,14 +6,14 @@
 
     local EnvProd = true
 
-    -- Fréquence Radio - Attention Callsigns & Radios du EWR et des GCI/CAP à paramétrer dans l'EM
+    -- Fréquences Radio - Attention Callsigns & Radios du EWR et des GCI/CAP à paramétrer dans l'EM
 
     local RadioGeneral = 305.00
     local RadioTanker1 = 260.00 -- Texaco
     local RadioTanker2 = 265.00 -- Arco
     local RadioTanker3 = 266.00 -- Shell
 
-    -- Provenances du vent
+    -- Provenances des vents
 
     local WIND = {}
     WIND.High   = 227   -- 26000 ft
@@ -121,7 +121,7 @@
     NAVAL.Blue  = {}
     NAVAL.Red   = {}
 
-    NAVAL.Blue.Cyprus_OTAN = GROUP:FindByName("NAVAL_Blue_Cyprus_OTAN"):Activate()
+    NAVAL.Blue.Cyprus_OTAN = GROUP:FindByName("NAVAL_Blue_Cyprus_OTAN")
 
     -- Air Groups
 
@@ -293,7 +293,7 @@
         --Tanker:SetDefaultCallsign(Callsign, 1) -- Suspiçion de bug Moose avec le SetDefaultCallsign des tankers
         Tanker:SetFuelLowThreshold(FuelLow)
         Tanker:AddMission(MissionTanker)
-        function Tanker:onafterSpawned (From, Event, To)
+        function Tanker:OnAfterSpawned (From, Event, To)
             GROUP:FindByName(GroupName):CommandSetCallsign(Callsign, 1) -- Contournement bug Moose avec le SetDefaultCallsign des tankers
             -- TANKER DUEL STATUS
             local SchedulerTanker = SCHEDULER:New( nil, TankerFuelStatus, {GroupName, Callsign, TANKERTYPE.Fuel, FuelLow/100, Radio}, 1, 30)
@@ -326,146 +326,150 @@
 
     -- OTAN
 
-        -- RECOVERYTANKER
-        local TankerOTAN = RECOVERYTANKER:New(UNIT:FindByName("NAVAL_Blue_Cyprus_OTAN_Carrier"), "TANKER_Blue_OTAN")
-        TankerOTAN:SetAltitude(6000)
-        TankerOTAN:SetSpeed(350)
-        TankerOTAN:SetTakeoffHot()
-        TankerOTAN:Start()
-
-        -- RECOVERYAWACS
-        local AwacsOTAN = RECOVERYTANKER:New("NAVAL_Blue_Cyprus_OTAN_Carrier", "AWACS_Blue_OTAN")
-        AwacsOTAN:SetAWACS()
-        AwacsOTAN:SetAltitude(20000)
-        AwacsOTAN:SetTakeoffHot()
-        AwacsOTAN:Start()
-
-        -- CAP/GCI OTAN
-
-        local ZoneCAPOTAN = ZONE_POLYGON:New("WPT_CAP_OTAN", GROUP:FindByName("WPT_CAP_OTAN"))
-        local DetectionOTAN = DETECTION_AREAS:New(EWR.OTAN, 150000)
-        local A2ADispatcherOTAN = AI_A2A_DISPATCHER:New(DetectionOTAN)
-        A2ADispatcherOTAN:SetBorderZone({BORDER.Blue.OTAN})
-        A2ADispatcherOTAN:SetDefaultFuelThreshold(0.4)
-        A2ADispatcherOTAN:SetDefaultGrouping(2)
-        A2ADispatcherOTAN:SetDefaultOverhead(2)
-        A2ADispatcherOTAN:SetDefaultLandingAtRunway()
-        A2ADispatcherOTAN:SetTacticalDisplay(TacticalDisplay)
-        -- CAP 1
-        A2ADispatcherOTAN:SetSquadron("OTAN CAP1", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"CAP_Blue_OTAN"}, 4)
-        A2ADispatcherOTAN:SetSquadronTakeoffFromParkingHot("OTAN CAP1")
-        A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP1", 1000, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 800, 4000, 8000, "RADIO")
-        A2ADispatcherOTAN:SetSquadronCapInterval("OTAN CAP1", 1, 60, 120, 1)
-        A2ADispatcherOTAN:SetSquadronGrouping("OTAN CAP1", 2)
-        -- CAP 2
-        A2ADispatcherOTAN:SetSquadron("OTAN CAP2", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"CAP_Blue_OTAN"}, 4)
-        A2ADispatcherOTAN:SetSquadronTakeoffFromParkingHot("OTAN CAP2")
-        A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP2", 1000, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 800, 4000, 8000, "RADIO")
-        A2ADispatcherOTAN:SetSquadronCapInterval("OTAN CAP2", 1, 600, 660, 1)
-        A2ADispatcherOTAN:SetSquadronGrouping("OTAN CAP2", 2)
-        -- GCI
-        A2ADispatcherOTAN:SetSquadron("OTAN GCI", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"GCI_Blue_OTAN"}, 2)
-        A2ADispatcherOTAN:SetSquadronTakeoffFromParkingHot("OTAN GCI")
-        A2ADispatcherOTAN:SetSquadronGrouping("OTAN GCI", 2)
-        A2ADispatcherOTAN:SetSquadronGci("OTAN GCI", 1000, 2000)
+        function CAPGCI_OTAN ()
+            NAVAL.Blue.Cyprus_OTAN:Activate()
+            -- RECOVERYTANKER
+            local TankerOTAN = RECOVERYTANKER:New(UNIT:FindByName("NAVAL_Blue_Cyprus_OTAN_Carrier"), "TANKER_Blue_OTAN")
+            TankerOTAN:SetAltitude(6000)
+            TankerOTAN:SetSpeed(350)
+            TankerOTAN:SetTakeoffHot()
+            TankerOTAN:Start()
+            -- RECOVERYAWACS
+            local AwacsOTAN = RECOVERYTANKER:New("NAVAL_Blue_Cyprus_OTAN_Carrier", "AWACS_Blue_OTAN")
+            AwacsOTAN:SetAWACS()
+            AwacsOTAN:SetAltitude(20000)
+            AwacsOTAN:SetTakeoffHot()
+            AwacsOTAN:Start()
+            -- CAP/GCI OTAN
+            local ZoneCAPOTAN = ZONE_POLYGON:New("WPT_CAP_OTAN", GROUP:FindByName("WPT_CAP_OTAN"))
+            local DetectionOTAN = DETECTION_AREAS:New(EWR.OTAN, 150000)
+            local A2ADispatcherOTAN = AI_A2A_DISPATCHER:New(DetectionOTAN)
+            A2ADispatcherOTAN:SetBorderZone({BORDER.Blue.OTAN})
+            A2ADispatcherOTAN:SetDefaultFuelThreshold(0.4)
+            A2ADispatcherOTAN:SetDefaultGrouping(2)
+            A2ADispatcherOTAN:SetDefaultOverhead(2)
+            A2ADispatcherOTAN:SetDefaultLandingAtRunway()
+            A2ADispatcherOTAN:SetTacticalDisplay(TacticalDisplay)
+            -- CAP 1
+            A2ADispatcherOTAN:SetSquadron("OTAN CAP1", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"CAP_Blue_OTAN"}, 4)
+            A2ADispatcherOTAN:SetSquadronTakeoffFromParkingHot("OTAN CAP1")
+            A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP1", 1000, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 800, 4000, 8000, "RADIO")
+            A2ADispatcherOTAN:SetSquadronCapInterval("OTAN CAP1", 1, 60, 120, 1)
+            A2ADispatcherOTAN:SetSquadronGrouping("OTAN CAP1", 2)
+            -- CAP 2
+            A2ADispatcherOTAN:SetSquadron("OTAN CAP2", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"CAP_Blue_OTAN"}, 4)
+            A2ADispatcherOTAN:SetSquadronTakeoffFromParkingHot("OTAN CAP2")
+            A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP2", 1000, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 800, 4000, 8000, "RADIO")
+            A2ADispatcherOTAN:SetSquadronCapInterval("OTAN CAP2", 1, 600, 660, 1)
+            A2ADispatcherOTAN:SetSquadronGrouping("OTAN CAP2", 2)
+            -- GCI
+            A2ADispatcherOTAN:SetSquadron("OTAN GCI", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"GCI_Blue_OTAN"}, 2)
+            A2ADispatcherOTAN:SetSquadronTakeoffFromParkingHot("OTAN GCI")
+            A2ADispatcherOTAN:SetSquadronGrouping("OTAN GCI", 2)
+            A2ADispatcherOTAN:SetSquadronGci("OTAN GCI", 1000, 2000)
+        end
 
     -- ISRAEL
 
-        -- CAP/GCI Israel
-
-        local ZoneCAPIsrael = ZONE_POLYGON:New("WPT_CAP_Israel", GROUP:FindByName("WPT_CAP_Israel"))
-        local DetectionIsrael = DETECTION_AREAS:New(EWR.Israel, 150000)
-        local A2ADispatcherIsrael = AI_A2A_DISPATCHER:New(DetectionIsrael)
-        A2ADispatcherIsrael:SetBorderZone({BORDER.Blue.Israel})
-        A2ADispatcherIsrael:SetDefaultFuelThreshold(0.4)
-        A2ADispatcherIsrael:SetDefaultGrouping(2)
-        A2ADispatcherIsrael:SetDefaultOverhead(2)
-        A2ADispatcherIsrael:SetDefaultLandingAtRunway()
-        A2ADispatcherIsrael:SetTacticalDisplay(TacticalDisplay)
-        -- CAP
-        A2ADispatcherIsrael:SetSquadron("Israel CAP", AIRBASE.Syria.Ramat_David, {"CAP_Blue_Israel"}, 4)
-        A2ADispatcherIsrael:SetSquadronTakeoffFromRunway("Israel CAP")
-        A2ADispatcherIsrael:SetSquadronCap2("Israel CAP", 1000, 2000, 2000, 10000, "BARO", ZoneCAPIsrael, 600, 800, 4000, 8000, "RADIO")
-        A2ADispatcherIsrael:SetSquadronCapInterval("Israel CAP", 1, 60, 120, 1)
-        A2ADispatcherIsrael:SetSquadronGrouping("Israel CAP", 2)
-        -- GCI
-        A2ADispatcherIsrael:SetSquadron("Israel GCI", AIRBASE.Syria.Ramat_David, {"GCI_Blue_Israel"}, 2)
-        A2ADispatcherIsrael:SetSquadronTakeoffFromRunway("Israel GCI")
-        A2ADispatcherIsrael:SetSquadronGrouping("Israel GCI", 2)
-        A2ADispatcherIsrael:SetSquadronGci("Israel GCI", 1000, 2000)
+        function CAPGCI_ISRAEL ()
+            -- CAP/GCI Israel
+            local ZoneCAPIsrael = ZONE_POLYGON:New("WPT_CAP_Israel", GROUP:FindByName("WPT_CAP_Israel"))
+            local DetectionIsrael = DETECTION_AREAS:New(EWR.Israel, 150000)
+            local A2ADispatcherIsrael = AI_A2A_DISPATCHER:New(DetectionIsrael)
+            A2ADispatcherIsrael:SetBorderZone({BORDER.Blue.Israel})
+            A2ADispatcherIsrael:SetDefaultFuelThreshold(0.4)
+            A2ADispatcherIsrael:SetDefaultGrouping(2)
+            A2ADispatcherIsrael:SetDefaultOverhead(2)
+            A2ADispatcherIsrael:SetDefaultLandingAtRunway()
+            A2ADispatcherIsrael:SetTacticalDisplay(TacticalDisplay)
+            -- CAP
+            A2ADispatcherIsrael:SetSquadron("Israel CAP", AIRBASE.Syria.Ramat_David, {"CAP_Blue_Israel"}, 4)
+            A2ADispatcherIsrael:SetSquadronTakeoffFromRunway("Israel CAP")
+            A2ADispatcherIsrael:SetSquadronCap2("Israel CAP", 1000, 2000, 2000, 10000, "BARO", ZoneCAPIsrael, 600, 800, 4000, 8000, "RADIO")
+            A2ADispatcherIsrael:SetSquadronCapInterval("Israel CAP", 1, 60, 120, 1)
+            A2ADispatcherIsrael:SetSquadronGrouping("Israel CAP", 2)
+            -- GCI
+            A2ADispatcherIsrael:SetSquadron("Israel GCI", AIRBASE.Syria.Ramat_David, {"GCI_Blue_Israel"}, 2)
+            A2ADispatcherIsrael:SetSquadronTakeoffFromRunway("Israel GCI")
+            A2ADispatcherIsrael:SetSquadronGrouping("Israel GCI", 2)
+            A2ADispatcherIsrael:SetSquadronGci("Israel GCI", 1000, 2000)
+        end
 
     -- TURKEY
 
-        -- CAP/GCI Turkey
-        local ZoneCAPTurkeyW = ZONE_POLYGON:New("WPT_CAP_TurkeyW", GROUP:FindByName("WPT_CAP_TurkeyW"))
-        local ZoneCAPTurkeyE = ZONE_POLYGON:New("WPT_CAP_TurkeyE", GROUP:FindByName("WPT_CAP_TurkeyE"))
-        local DetectionTurkey = DETECTION_AREAS:New(EWR.Turkey, 150000)
-        local A2ADispatcherTurkey = AI_A2A_DISPATCHER:New(DetectionTurkey)
-        A2ADispatcherTurkey:SetBorderZone({BORDER.Blue.Turkey})
-        A2ADispatcherTurkey:SetDefaultFuelThreshold(0.4)
-        A2ADispatcherTurkey:SetDefaultGrouping(2)
-        A2ADispatcherTurkey:SetDefaultOverhead(2)
-        A2ADispatcherTurkey:SetDefaultLandingAtRunway()
-        A2ADispatcherTurkey:SetTacticalDisplay(TacticalDisplay)
-        -- CAP West
-        A2ADispatcherTurkey:SetSquadron("Turkey CAPW", AIRBASE.Syria.Incirlik, {"CAP_Blue_Turkey"}, 4)
-        A2ADispatcherTurkey:SetSquadronTakeoffFromRunway("Turkey CAPW")
-        A2ADispatcherTurkey:SetSquadronCap2("Turkey CAPW", 1000, 2000, 2000, 10000, "BARO", ZoneCAPTurkeyW, 600, 800, 4000, 8000, "RADIO")
-        A2ADispatcherTurkey:SetSquadronCapInterval("Turkey CAPW", 1, 60, 120, 1)
-        A2ADispatcherTurkey:SetSquadronGrouping("Turkey CAPW", 2)
-        -- CAP East
-        A2ADispatcherTurkey:SetSquadron("Turkey CAPE", AIRBASE.Syria.Incirlik, {"CAP_Blue_Turkey"}, 4)
-        A2ADispatcherTurkey:SetSquadronTakeoffFromRunway("Turkey CAPE")
-        A2ADispatcherTurkey:SetSquadronCap2("Turkey CAPE", 1000, 2000, 2000, 10000, "BARO", ZoneCAPTurkeyE, 600, 800, 4000, 8000, "RADIO")
-        A2ADispatcherTurkey:SetSquadronCapInterval("Turkey CAPE", 1, 60, 120, 1)
-        A2ADispatcherTurkey:SetSquadronGrouping("Turkey CAPE", 2)
-        -- GCI
-        A2ADispatcherTurkey:SetSquadron("Turkey GCI", AIRBASE.Syria.Incirlik, {"GCI_Blue_Turkey"}, 2)
-        A2ADispatcherTurkey:SetSquadronTakeoffFromRunway("Turkey GCI")
-        A2ADispatcherTurkey:SetSquadronGrouping("Turkey GCI", 2)
-        A2ADispatcherTurkey:SetSquadronGci("Turkey GCI", 1000, 2000)
+        function CAPGCI_TURKEY ()
+            -- CAP/GCI Turkey
+            local ZoneCAPTurkeyW = ZONE_POLYGON:New("WPT_CAP_TurkeyW", GROUP:FindByName("WPT_CAP_TurkeyW"))
+            local ZoneCAPTurkeyE = ZONE_POLYGON:New("WPT_CAP_TurkeyE", GROUP:FindByName("WPT_CAP_TurkeyE"))
+            local DetectionTurkey = DETECTION_AREAS:New(EWR.Turkey, 150000)
+            local A2ADispatcherTurkey = AI_A2A_DISPATCHER:New(DetectionTurkey)
+            A2ADispatcherTurkey:SetBorderZone({BORDER.Blue.Turkey})
+            A2ADispatcherTurkey:SetDefaultFuelThreshold(0.4)
+            A2ADispatcherTurkey:SetDefaultGrouping(2)
+            A2ADispatcherTurkey:SetDefaultOverhead(2)
+            A2ADispatcherTurkey:SetDefaultLandingAtRunway()
+            A2ADispatcherTurkey:SetTacticalDisplay(TacticalDisplay)
+            -- CAP West
+            A2ADispatcherTurkey:SetSquadron("Turkey CAPW", AIRBASE.Syria.Incirlik, {"CAP_Blue_Turkey"}, 4)
+            A2ADispatcherTurkey:SetSquadronTakeoffFromRunway("Turkey CAPW")
+            A2ADispatcherTurkey:SetSquadronCap2("Turkey CAPW", 1000, 2000, 2000, 10000, "BARO", ZoneCAPTurkeyW, 600, 800, 4000, 8000, "RADIO")
+            A2ADispatcherTurkey:SetSquadronCapInterval("Turkey CAPW", 1, 60, 120, 1)
+            A2ADispatcherTurkey:SetSquadronGrouping("Turkey CAPW", 2)
+            -- CAP East
+            A2ADispatcherTurkey:SetSquadron("Turkey CAPE", AIRBASE.Syria.Incirlik, {"CAP_Blue_Turkey"}, 4)
+            A2ADispatcherTurkey:SetSquadronTakeoffFromRunway("Turkey CAPE")
+            A2ADispatcherTurkey:SetSquadronCap2("Turkey CAPE", 1000, 2000, 2000, 10000, "BARO", ZoneCAPTurkeyE, 600, 800, 4000, 8000, "RADIO")
+            A2ADispatcherTurkey:SetSquadronCapInterval("Turkey CAPE", 1, 60, 120, 1)
+            A2ADispatcherTurkey:SetSquadronGrouping("Turkey CAPE", 2)
+            -- GCI
+            A2ADispatcherTurkey:SetSquadron("Turkey GCI", AIRBASE.Syria.Incirlik, {"GCI_Blue_Turkey"}, 2)
+            A2ADispatcherTurkey:SetSquadronTakeoffFromRunway("Turkey GCI")
+            A2ADispatcherTurkey:SetSquadronGrouping("Turkey GCI", 2)
+            A2ADispatcherTurkey:SetSquadronGci("Turkey GCI", 1000, 2000)
+        end
 
     -- SYRIA
 
-        -- CAP/GCI Syria
-        local ZoneCAPSyriaW = ZONE_POLYGON:New("WPT_CAP_SyriaW", GROUP:FindByName("WPT_CAP_SyriaW"))
-        local ZoneCAPSyriaE = ZONE_POLYGON:New("WPT_CAP_SyriaE", GROUP:FindByName("WPT_CAP_SyriaE"))
-        local DetectionSyria = DETECTION_AREAS:New(EWR.Syria, 150000)
-        local A2ADispatcherSyria = AI_A2A_DISPATCHER:New(DetectionSyria)
-        A2ADispatcherSyria:SetBorderZone({BORDER.Blue.Syria})
-        A2ADispatcherSyria:SetDefaultFuelThreshold(0.4)
-        A2ADispatcherSyria:SetDefaultGrouping(2)
-        A2ADispatcherSyria:SetDefaultOverhead(2)
-        A2ADispatcherSyria:SetDefaultLandingAtRunway()
-        A2ADispatcherSyria:SetTacticalDisplay(TacticalDisplay)
-        -- CAP West
-        A2ADispatcherSyria:SetSquadron("Syria CAPW", AIRBASE.Syria.Hama, {"CAP_Blue_Syria"}, 4)
-        A2ADispatcherSyria:SetSquadronTakeoffFromRunway("Syria CAPW")
-        A2ADispatcherSyria:SetSquadronCap2("Syria CAPW", 1000, 2000, 2000, 10000, "BARO", ZoneCAPSyriaW, 600, 800, 4000, 8000, "RADIO")
-        A2ADispatcherSyria:SetSquadronCapInterval("Syria CAPW", 1, 60, 120, 1)
-        A2ADispatcherSyria:SetSquadronGrouping("Syria CAPW", 2)
-        -- CAP East
-        A2ADispatcherSyria:SetSquadron("Syria CAPE", AIRBASE.Syria.Palmyra, {"CAP_Blue_Syria"}, 4)
-        A2ADispatcherSyria:SetSquadronTakeoffFromRunway("Syria CAPE")
-        A2ADispatcherSyria:SetSquadronCap2("Syria CAPE", 1000, 2000, 2000, 10000, "BARO", ZoneCAPSyriaE, 600, 800, 4000, 8000, "RADIO")
-        A2ADispatcherSyria:SetSquadronCapInterval("Syria CAPE", 1, 60, 120, 1)
-        A2ADispatcherSyria:SetSquadronGrouping("Syria CAPE", 2)
-        -- GCI West
-        A2ADispatcherSyria:SetSquadron("Syria GCIW", AIRBASE.Syria.Abu_al_Duhur, {"GCI_Blue_Syria"}, 2)
-        A2ADispatcherSyria:SetSquadronTakeoffFromRunway("Syria GCIW")
-        A2ADispatcherSyria:SetSquadronGrouping("Syria GCIW", 2)
-        A2ADispatcherSyria:SetSquadronGci("Syria GCIW", 1000, 2000)
-        -- GCI Est
-        A2ADispatcherSyria:SetSquadron("Syria GCIE", AIRBASE.Syria.Tabqa, {"GCI_Blue_Syria"}, 2)
-        A2ADispatcherSyria:SetSquadronTakeoffFromRunway("Syria GCIE")
-        A2ADispatcherSyria:SetSquadronGrouping("Syria GCIE", 2)
-        A2ADispatcherSyria:SetSquadronGci("Syria GCIE", 1000, 2000)
+        function CAPGCI_SYRIA ()
+            -- CAP/GCI Syria
+            local ZoneCAPSyriaW = ZONE_POLYGON:New("WPT_CAP_SyriaW", GROUP:FindByName("WPT_CAP_SyriaW"))
+            local ZoneCAPSyriaE = ZONE_POLYGON:New("WPT_CAP_SyriaE", GROUP:FindByName("WPT_CAP_SyriaE"))
+            local DetectionSyria = DETECTION_AREAS:New(EWR.Syria, 150000)
+            local A2ADispatcherSyria = AI_A2A_DISPATCHER:New(DetectionSyria)
+            A2ADispatcherSyria:SetBorderZone({BORDER.Blue.Syria})
+            A2ADispatcherSyria:SetDefaultFuelThreshold(0.4)
+            A2ADispatcherSyria:SetDefaultGrouping(2)
+            A2ADispatcherSyria:SetDefaultOverhead(2)
+            A2ADispatcherSyria:SetDefaultLandingAtRunway()
+            A2ADispatcherSyria:SetTacticalDisplay(TacticalDisplay)
+            -- CAP West
+            A2ADispatcherSyria:SetSquadron("Syria CAPW", AIRBASE.Syria.Hama, {"CAP_Blue_Syria"}, 4)
+            A2ADispatcherSyria:SetSquadronTakeoffFromRunway("Syria CAPW")
+            A2ADispatcherSyria:SetSquadronCap2("Syria CAPW", 1000, 2000, 2000, 10000, "BARO", ZoneCAPSyriaW, 600, 800, 4000, 8000, "RADIO")
+            A2ADispatcherSyria:SetSquadronCapInterval("Syria CAPW", 1, 60, 120, 1)
+            A2ADispatcherSyria:SetSquadronGrouping("Syria CAPW", 2)
+            -- CAP East
+            A2ADispatcherSyria:SetSquadron("Syria CAPE", AIRBASE.Syria.Palmyra, {"CAP_Blue_Syria"}, 4)
+            A2ADispatcherSyria:SetSquadronTakeoffFromRunway("Syria CAPE")
+            A2ADispatcherSyria:SetSquadronCap2("Syria CAPE", 1000, 2000, 2000, 10000, "BARO", ZoneCAPSyriaE, 600, 800, 4000, 8000, "RADIO")
+            A2ADispatcherSyria:SetSquadronCapInterval("Syria CAPE", 1, 60, 120, 1)
+            A2ADispatcherSyria:SetSquadronGrouping("Syria CAPE", 2)
+            -- GCI West
+            A2ADispatcherSyria:SetSquadron("Syria GCIW", AIRBASE.Syria.Abu_al_Duhur, {"GCI_Blue_Syria"}, 2)
+            A2ADispatcherSyria:SetSquadronTakeoffFromRunway("Syria GCIW")
+            A2ADispatcherSyria:SetSquadronGrouping("Syria GCIW", 2)
+            A2ADispatcherSyria:SetSquadronGci("Syria GCIW", 1000, 2000)
+            -- GCI Est
+            A2ADispatcherSyria:SetSquadron("Syria GCIE", AIRBASE.Syria.Tabqa, {"GCI_Blue_Syria"}, 2)
+            A2ADispatcherSyria:SetSquadronTakeoffFromRunway("Syria GCIE")
+            A2ADispatcherSyria:SetSquadronGrouping("Syria GCIE", 2)
+            A2ADispatcherSyria:SetSquadronGci("Syria GCIE", 1000, 2000)
+        end
 
     -- RED
 
-        -- CAP/GCI Red
-
-            -- Callsigns & Radios à paramétrer dans l'EM
+        function CAPGCI_RED ()
+            -- CAP/GCI Red
             local ZoneCAPRed = ZONE_POLYGON:New("WPT_CAP_Red", GROUP:FindByName("WPT_CAP_Red"))
             local DetectionRed = DETECTION_AREAS:New(EWR.Red, 150000)
             local A2ADispatcherRed = AI_A2A_DISPATCHER:New(DetectionRed)
@@ -491,6 +495,7 @@
             A2ADispatcherRed:SetSquadronTakeoffFromRunway("Red GCIS")
             A2ADispatcherRed:SetSquadronGrouping("Red GCIS", 2)
             A2ADispatcherRed:SetSquadronGci("Red GCIS", 1000, 2000)
+        end
 
 ---------------------------------------------------------------------------------------------------
 -- MISSION 01
@@ -524,7 +529,7 @@
 
         function Auftrag_M01_Red_AttackConvoi ()
             -- TARGET
-            local target = GROUP:FindByName("M01_Blue_Convoi"):GetCoordinate()
+            local target = GROUP:FindByName("M01_Blue_Convoi"):Activate():GetCoordinate()
             -- AUFTRAG
             local auftrag = AUFTRAG:NewBOMBING(target)
             auftrag:SetROT(ENUMS.ROT.NoReaction)
@@ -578,8 +583,116 @@
             end
         end
 
+    -- RED Convois
+
+        function Spawn_Convois_Red ()
+            local TargetA = GROUP:FindByName("M01_Red_ConvoiA"):Activate()
+            local TargetB = GROUP:FindByName("M01_Red_ConvoiB"):Activate()
+        end
+
+    -- BLUE Management
+
+        function Auftrag_M01_Blue_CAS ()
+
+            -- Squadrons
+
+            local Blue_Squadron_Su25 = SQUADRON:New("M01_Blue_Su25", 3, "Blue_Squadron_Su25")
+            Blue_Squadron_Su25:AddMissionCapability({AUFTRAG.Type.CAS})
+            Blue_Squadron_Su25:SetSkill(AI.Skill.HIGH)
+            Blue_Squadron_Su25:SetLivery("IRRE_AAA_Oppo")
+
+            local Blue_Squadron_L39 = SQUADRON:New("M01_Blue_L39", 3, "Blue_Squadron_L39")
+            Blue_Squadron_L39:AddMissionCapability({AUFTRAG.Type.CAS})
+            Blue_Squadron_L39:SetSkill(AI.Skill.HIGH)
+            Blue_Squadron_L39:SetLivery("IRRE_AAA_Oppo")
+
+            local Blue_Squadron_Hind = SQUADRON:New("M01_Blue_Hind", 2, "Blue_Squadron_Hind")
+            Blue_Squadron_Hind:AddMissionCapability({AUFTRAG.Type.CAS})
+            Blue_Squadron_Hind:SetSkill(AI.Skill.HIGH)
+            Blue_Squadron_Hind:SetLivery("IRRE_AAA_Oppo")
+
+            local Blue_Squadron_Mi8 = SQUADRON:New("M01_Blue_Mi8", 2, "Blue_Squadron_Mi8")
+            Blue_Squadron_Mi8:AddMissionCapability({AUFTRAG.Type.CAS})
+            Blue_Squadron_Mi8:SetSkill(AI.Skill.HIGH)
+            Blue_Squadron_Mi8:SetLivery("IRRE_AAA")
+
+            -- Airwings
+
+            local Blue_Airwing_Su25 = AIRWING:New("M01_Blue_Warehouse1")
+            Blue_Airwing_Su25:AddSquadron(Blue_Squadron_Su25)
+            Blue_Airwing_Su25:NewPayload(GROUP:FindByName("M01_Blue_Su25-CAS"), -1, {AUFTRAG.Type.CAS}, 100)
+            Blue_Airwing_Su25:Start()
+
+            local Blue_Airwing_L39 = AIRWING:New("M01_Blue_Warehouse2")
+            Blue_Airwing_L39:AddSquadron(Blue_Squadron_L39)
+            Blue_Airwing_L39:NewPayload(GROUP:FindByName("M01_Blue_L39-CAS"), -1, {AUFTRAG.Type.CAS}, 100)
+            Blue_Airwing_L39:Start()
+
+            local Blue_Airwing_Hind = AIRWING:New("M01_Blue_Warehouse3")
+            Blue_Airwing_Hind:AddSquadron(Blue_Squadron_Hind)
+            Blue_Airwing_Hind:NewPayload(GROUP:FindByName("M01_Blue_Hind-CAS"), -1, {AUFTRAG.Type.CAS}, 100)
+            Blue_Airwing_Hind:Start()
+
+            local Blue_Airwing_Mi8 = AIRWING:New("M01_Blue_Warehouse4")
+            Blue_Airwing_Mi8:AddSquadron(Blue_Squadron_Mi8)
+            Blue_Airwing_Mi8:NewPayload(GROUP:FindByName("M01_Blue_Mi8-CAS"), -1, {AUFTRAG.Type.CAS}, 100)
+            Blue_Airwing_Mi8:Start()
+
+            -- Auftrags
+
+            local Blue_Auftrag_Su25_CAS = AUFTRAG:NewCAS(ZONE:New('M01_ZoneBlueCAS'), 5000, 350)
+            Blue_Auftrag_Su25_CAS:SetROE(ENUMS.ROE.OpenFire)
+            Blue_Auftrag_Su25_CAS:SetROT(ENUMS.ROT.BypassAndEscape)
+            Blue_Auftrag_Su25_CAS:SetMissionSpeed(350)
+            Blue_Auftrag_Su25_CAS:SetEngageAltitude(2000)
+            Blue_Auftrag_Su25_CAS:SetRepeat(3)
+
+            local Blue_Auftrag_L39_CAS = AUFTRAG:NewCAS(ZONE:New('M01_ZoneBlueCAS'), 5000, 350)
+            Blue_Auftrag_L39_CAS:SetROE(ENUMS.ROE.OpenFire)
+            Blue_Auftrag_L39_CAS:SetROT(ENUMS.ROT.BypassAndEscape)
+            Blue_Auftrag_L39_CAS:SetMissionSpeed(350)
+            Blue_Auftrag_L39_CAS:SetEngageAltitude(2000)
+            Blue_Auftrag_L39_CAS:SetRepeat(3)
+
+            local Blue_Auftrag_Hind_CAS = AUFTRAG:NewCAS(ZONE:New('M01_ZoneBlueCAS'), 2000, 150)
+            Blue_Auftrag_Hind_CAS:SetROE(ENUMS.ROE.OpenFire)
+            Blue_Auftrag_Hind_CAS:SetROT(ENUMS.ROT.BypassAndEscape)
+            Blue_Auftrag_Hind_CAS:SetMissionSpeed(150)
+            Blue_Auftrag_Hind_CAS:SetEngageAltitude(1500)
+            Blue_Auftrag_Hind_CAS:SetRepeat(2)
+
+            local Blue_Auftrag_Mi8_CAS = AUFTRAG:NewCAS(ZONE:New('M01_ZoneBlueCAS'), 2000, 150)
+            Blue_Auftrag_Mi8_CAS:SetROE(ENUMS.ROE.OpenFire)
+            Blue_Auftrag_Mi8_CAS:SetROT(ENUMS.ROT.BypassAndEscape)
+            Blue_Auftrag_Mi8_CAS:SetMissionSpeed(150)
+            Blue_Auftrag_Mi8_CAS:SetEngageAltitude(1500)
+            Blue_Auftrag_Mi8_CAS:SetRepeat(2)
+
+            -- Affectations Auftrags
+
+            Blue_Airwing_Hind:AddMission(Blue_Auftrag_Hind_CAS)
+            Blue_Airwing_Mi8:AddMission(Blue_Auftrag_Mi8_CAS)
+            Blue_Airwing_Su25:AddMission(Blue_Auftrag_Su25_CAS)
+            Blue_Airwing_L39:AddMission(Blue_Auftrag_L39_CAS)
+
+            -- Blue_Auftrag_Su25_CAS:HandleEvent(EVENTS.Shot)
+            -- function Blue_Auftrag_Su25_CAS:OnEventShot(EventData)
+            --     local test = Blue_Auftrag_Su25_CAS:GetOpsGroups()
+            --     BASE:E("TEST OPS GROUP")
+            --     BASE:E(test)
+            -- end
+
+        end
+
     -- Executions
 
-        Spawn_EWR_Red ()
-        Auftrag_M01_Red_Tankers ()
-        Auftrag_M01_Red_AttackConvoi ()
+    -- CAPGCI_OTAN()
+    -- CAPGCI_ISRAEL()
+    -- CAPGCI_TURKEY()
+    -- CAPGCI_SYRIA()
+    -- CAPGCI_RED()
+    -- Spawn_EWR_Red()
+    -- Auftrag_M01_Red_Tankers()
+    -- Auftrag_M01_Red_AttackConvoi()
+    Spawn_Convois_Red()
+    Auftrag_M01_Blue_CAS()
