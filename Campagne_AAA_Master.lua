@@ -13,7 +13,7 @@
     local RadioTanker2 = 265.00 -- Arco
     local RadioTanker3 = 266.00 -- Shell
 
-    -- Provenances des vents
+    -- Direction des vents (cf ME)
 
     local WIND = {}
     WIND.High   = 227   -- 26000 ft
@@ -144,6 +144,18 @@
     EWR.OTAN    = SET_GROUP:New():FilterPrefixes({"NAVAL_Blue_Cyprus_OTAN", "AWACS_Blue_OTAN"}):FilterStart()
     EWR.Turkey  = SET_GROUP:New():FilterPrefixes({"SAM_Blue_Turkey"}):FilterStart()
     EWR.Syria   = SET_GROUP:New():FilterPrefixes({"SAM_Blue_Syria"}):FilterStart()
+
+    -- WindsInverter
+
+    local function WindsInverter (Wind)
+        local result
+        local test = Wind + 180
+        if test >= 360 then result = Wind - 180 else result = test end
+        return result
+    end
+    WIND.High   = WindsInverter(WIND.High)
+    WIND.Medium = WindsInverter(WIND.Medium)
+    WIND.Low    = WindsInverter(WIND.Low)
 
 ---------------------------------------------------------------------------------------------------
 -- BORDER SAM LOGIC
@@ -281,30 +293,41 @@
 -- TANKER FUNCTIONS
 ---------------------------------------------------------------------------------------------------
 
-    function LaunchTanker (GroupName, ZoneName, PATTERN, TANKERTYPE, FuelLow, Radio, Callsign, HomeBase, DepartureTime, TACAN)
+    function LaunchTanker (GroupName, TANKERTYPE, PATTERN, COMMS, HomeBase, TACAN, FuelLow, DepartureTime, ESCORT)
         -- AUFTRAG TANKER
-        local MissionTanker = AUFTRAG:NewTANKER(ZONE:New(ZoneName):GetCoordinate(), PATTERN.Altitude, PATTERN.Speed, PATTERN.Heading, PATTERN.Leg, TANKERTYPE.Type)
+        local MissionTanker = AUFTRAG:NewTANKER(ZONE:New(PATTERN.ZoneName):GetCoordinate(), PATTERN.Altitude, PATTERN.Speed, PATTERN.Heading, PATTERN.Leg, TANKERTYPE.Type)
         if TACAN then MissionTanker:SetTACAN(TACAN.Channel, TACAN.Morse, nil, TACAN.Band) end
         MissionTanker:SetTime(DepartureTime)
         -- FLIGHTGROUP TANKER
         local Tanker = FLIGHTGROUP:New(GroupName)
         Tanker:SetHomebase(AIRBASE:FindByName(HomeBase))
-        Tanker:SwitchRadio(Radio, radio.modulation.AM)
+        Tanker:SwitchRadio(COMMS.Frequency, radio.modulation.AM)
         --Tanker:SetDefaultCallsign(Callsign, 1) -- Suspiçion de bug Moose avec le SetDefaultCallsign des tankers
         Tanker:SetFuelLowThreshold(FuelLow)
         Tanker:AddMission(MissionTanker)
         function Tanker:OnAfterSpawned (From, Event, To)
-            GROUP:FindByName(GroupName):CommandSetCallsign(Callsign, 1) -- Contournement bug Moose avec le SetDefaultCallsign des tankers
+            GROUP:FindByName(GroupName):CommandSetCallsign(COMMS.Callsign, 1) -- Contournement bug Moose avec le SetDefaultCallsign des tankers
+            -- TANKER ESCORT
+            if ESCORT then
+                BASE:E(ESCORT.Name)
+                local MissionEscort = AUFTRAG:NewESCORT(Tanker:GetGroup())
+                local Escort = FLIGHTGROUP:New(ESCORT.Name)
+                Escort:SetDefaultFormation(ENUMS.Formation.FixedWing.FighterVic.Close)
+                Escort:SetDefaultCallsign(ESCORT.Callsign, ESCORT.CallsignNumber)
+                Escort:SetFuelLowThreshold(40)
+                Escort:SetFuelLowRefuel(true)
+                Escort:AddMission(MissionEscort)
+            end
             -- TANKER DUEL STATUS
-            local SchedulerTanker = SCHEDULER:New( nil, TankerFuelStatus, {GroupName, Callsign, TANKERTYPE.Fuel, FuelLow/100, Radio}, 1, 30)
+            local SchedulerTanker = SCHEDULER:New( nil, TankerFuelStatus, {GroupName, COMMS, TANKERTYPE.Fuel, FuelLow/100}, 1, 30)
         end
     end
 
     -- TANKER FUEL STATUS
-    function TankerFuelStatus (GroupName, CallsignNumber, FuelWeight, FuelLow, Frequency)
+    function TankerFuelStatus (GroupName, COMMS, FuelWeight, FuelLow)
         local Callsign = nil
         for key, value in pairs(CALLSIGN.Tanker) do
-            if value == CallsignNumber then
+            if value == COMMS.Callsign then
                 Callsign = key
             end
         end
@@ -313,7 +336,7 @@
         if FuelLeft > 0 then
             local GroupRadio = Group:GetRadio()
             GroupRadio:SetFileName("Blank.ogg")
-            GroupRadio:SetFrequency(Frequency)
+            GroupRadio:SetFrequency(COMMS.Frequency)
             GroupRadio:SetModulation(radio.modulation.AM)
             GroupRadio:SetSubtitle(Callsign .. ", fuel left : " .. FuelLeft .. " lbs", 3)
             GroupRadio:Broadcast()
@@ -513,53 +536,74 @@
             -- Arco
             LaunchTanker (
                 "TANKER_Red_IL78", -- GroupName
-                "ZONE_Tanker_Red", -- ZoneName
-                {["Altitude"] = 20000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
                 TANKER.IL78, -- TANKERTYPE
-                10, -- FuelLow (%)
-                RadioTanker2, -- Radio
-                CALLSIGN.Tanker.Arco, -- Callsign
+                {["ZoneName"] = "ZONE_Tanker_Red", ["Altitude"] = 20000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
+                {["Frequency"] = RadioTanker2, ["Callsign"] = CALLSIGN.Tanker.Arco}, -- COMMS
                 AIRBASE.Syria.Damascus, -- HomeBase
+                {["Channel"] = 11, ["Morse"] = "ARC", ["Band"] = "Y"}, -- TACAN
+                10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
                 10, -- DepartureTime (s)
-                {["Channel"] = 11, ["Morse"] = "ARC", ["Band"] = "Y"} -- TACAN
+                {["Name"] = "Escort_Red", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 1} -- ESCORT
             )
         end
 
     -- RED Su-24
 
         function Auftrag_M01_Red_AttackConvoi ()
-            -- TARGET
+
+            -- AUFTRAG ORBIT
+            local auftragOrbit = AUFTRAG:NewORBIT_CIRCLE(ZONE:New("M01_Zone_M01_WPT1"):GetCoordinate(), 15000, 350)
+            auftragOrbit:SetMissionAltitude(15000)
+            auftragOrbit:SetMissionSpeed(350)
+
+            -- AUFTRAG BOMBING
             local target = GROUP:FindByName("M01_Blue_Convoi"):Activate():GetCoordinate()
-            -- AUFTRAG
-            local auftrag = AUFTRAG:NewBOMBING(target)
-            auftrag:SetROT(ENUMS.ROT.NoReaction)
-            auftrag:SetWeaponExpend(AI.Task.WeaponExpend.ALL)
-            auftrag:SetWeaponType(ENUMS.WeaponFlag.AnyUnguided)
-            auftrag:SetMissionWaypointCoord(ZONE:New("M01_Zone_M01_IP"):GetCoordinate())
-            auftrag:SetMissionAltitude(3000)
-            auftrag:SetEngageAltitude(3000)
-            auftrag:SetMissionSpeed(350)
-              -- FLIGHTGROUP
+            local auftragBombing = AUFTRAG:NewBOMBING(target)
+            auftragBombing:SetROT(ENUMS.ROT.NoReaction)
+            auftragBombing:SetWeaponExpend(AI.Task.WeaponExpend.ALL)
+            auftragBombing:SetWeaponType(ENUMS.WeaponFlag.AnyUnguided)
+            auftragBombing:SetMissionWaypointCoord(ZONE:New("M01_Zone_M01_IP"):GetCoordinate())
+            auftragBombing:SetMissionAltitude(3000)
+            auftragBombing:SetEngageAltitude(3000)
+            auftragBombing:SetMissionSpeed(350)
+
+            -- FLIGHTGROUP
             local bomber = FLIGHTGROUP:New("M01_Red_Su24")
-            bomber:AddWaypoint(ZONE:New("M01_Zone_M01_WPT1"):GetCoordinate(), nil, nil, 12500)
-            bomber:AddWaypoint(ZONE:New("M01_Zone_M01_WPT2"):GetCoordinate(), nil, nil, 12500)
-            bomber:AddWaypoint(ZONE:New("M01_Zone_M01_WPT3"):GetCoordinate(), nil, nil, 6500)
             bomber:SwitchRadio(RadioGeneral, radio.modulation.AM)
             bomber:SetDefaultCallsign(CALLSIGN.Aircraft.Uzi, 9)
             bomber:SetDefaultFormation(ENUMS.Formation.FixedWing.FighterVic.Close)
+            bomber:AddMission(auftragOrbit)
+            bomber:AddMission(auftragBombing)
             bomber:HandleEvent(EVENTS.Shot)
-            bomber:AddMission(auftrag)
             bomber:Activate()
+
             function bomber:OnAfterPassingWaypoint (From, Event, To, Waypoint)
-                if Waypoint.uid == 3 then bomber:SwitchFormation(ENUMS.Formation.FixedWing.Trail.Close) end
+                if Waypoint.uid == 2 then
+                    MenuCommandStartMissionBombing = MENU_COALITION_COMMAND:New(coalition.side.RED, "Démarrage Mission Su-24", nil, function ()
+                        MenuCommandStartMissionBombing:Remove()
+                        auftragOrbit:Cancel()
+                    end, nil)
+                elseif Waypoint.uid == 3 then
+                    bomber:SwitchFormation(ENUMS.Formation.FixedWing.Trail.Close)
+                end
             end
-            function auftrag:OnAfterDone (From,Event,To)
-                for _,opsgroup in pairs(auftrag:GetOpsGroups()) do
+
+            function auftragOrbit:OnAfterDone (From, Event, To)
+                for _,opsgroup in pairs(auftragBombing:GetOpsGroups()) do
+                    local flightgroup = opsgroup
+                    flightgroup:AddWaypoint(ZONE:New("M01_Zone_M01_WPT2"):GetCoordinate(), nil, nil, 12500)
+                    flightgroup:AddWaypoint(ZONE:New("M01_Zone_M01_WPT3"):GetCoordinate(), nil, nil, 6500)
+                end
+            end
+
+            function auftragBombing:OnAfterDone (From,Event,To)
+                for _,opsgroup in pairs(auftragBombing:GetOpsGroups()) do
                     local flightgroup = opsgroup
                     flightgroup:SwitchFormation(ENUMS.Formation.FixedWing.FighterVic.Close)
                     flightgroup:RTB(AIRBASE:FindByName(AIRBASE.Syria.Mezzeh))
                 end
             end
+
             -- BREVITY Su-24
             SET_UNIT:New():FilterPrefixes("M01_Red_Su24"):FilterStart():FilterStop():ForEachUnit(
                 function (unit)
@@ -685,12 +729,12 @@
 
     -- Executions
 
-    -- CAPGCI_OTAN()
-    -- CAPGCI_ISRAEL()
-    -- CAPGCI_TURKEY()
-    -- CAPGCI_SYRIA()
-    -- CAPGCI_RED()
-    -- Spawn_EWR_Red()
-    -- Auftrag_M01_Red_Tankers()
-    -- Auftrag_M01_Red_AttackConvoi()
-    Auftrag_M01_Blue_CAS()
+        -- CAPGCI_OTAN()
+        -- CAPGCI_ISRAEL()
+        -- CAPGCI_TURKEY()
+        -- CAPGCI_SYRIA()
+        -- CAPGCI_RED()
+        -- Spawn_EWR_Red()
+        Auftrag_M01_Red_Tankers()
+        Auftrag_M01_Red_AttackConvoi()
+        Auftrag_M01_Blue_CAS()
