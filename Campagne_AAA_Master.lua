@@ -310,7 +310,7 @@
             -- TANKER ESCORT
             if ESCORT then
                 BASE:E(ESCORT.Name)
-                local MissionEscort = AUFTRAG:NewESCORT(Tanker:GetGroup())
+                local MissionEscort = AUFTRAG:NewESCORT(Tanker:GetGroup(), nil, 50000)
                 local Escort = FLIGHTGROUP:New(ESCORT.Name)
                 Escort:SetDefaultFormation(ENUMS.Formation.FixedWing.FighterVic.Close)
                 Escort:SetDefaultCallsign(ESCORT.Callsign, ESCORT.CallsignNumber)
@@ -379,12 +379,6 @@
             A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP1", 1000, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 800, 4000, 8000, "RADIO")
             A2ADispatcherOTAN:SetSquadronCapInterval("OTAN CAP1", 1, 60, 120, 1)
             A2ADispatcherOTAN:SetSquadronGrouping("OTAN CAP1", 2)
-            -- CAP 2
-            A2ADispatcherOTAN:SetSquadron("OTAN CAP2", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"CAP_Blue_OTAN"}, 4)
-            A2ADispatcherOTAN:SetSquadronTakeoffFromParkingHot("OTAN CAP2")
-            A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP2", 1000, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 800, 4000, 8000, "RADIO")
-            A2ADispatcherOTAN:SetSquadronCapInterval("OTAN CAP2", 1, 600, 660, 1)
-            A2ADispatcherOTAN:SetSquadronGrouping("OTAN CAP2", 2)
             -- GCI
             A2ADispatcherOTAN:SetSquadron("OTAN GCI", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"GCI_Blue_OTAN"}, 2)
             A2ADispatcherOTAN:SetSquadronTakeoffFromParkingHot("OTAN GCI")
@@ -462,7 +456,7 @@
             A2ADispatcherSyria:SetBorderZone({BORDER.Blue.Syria})
             A2ADispatcherSyria:SetDefaultFuelThreshold(0.4)
             A2ADispatcherSyria:SetDefaultGrouping(2)
-            A2ADispatcherSyria:SetDefaultOverhead(2)
+            A2ADispatcherSyria:SetDefaultOverhead(1)
             A2ADispatcherSyria:SetDefaultLandingAtRunway()
             A2ADispatcherSyria:SetTacticalDisplay(TacticalDisplay)
             -- CAP West
@@ -591,7 +585,7 @@
             function auftragOrbit:OnAfterDone (From, Event, To)
                 for _,opsgroup in pairs(auftragBombing:GetOpsGroups()) do
                     local flightgroup = opsgroup
-                    flightgroup:AddWaypoint(ZONE:New("M01_Zone_M01_WPT2"):GetCoordinate(), nil, nil, 12500)
+                    flightgroup:AddWaypoint(ZONE:New("M01_Zone_M01_WPT2"):GetCoordinate(), nil, nil, 6500)
                     flightgroup:AddWaypoint(ZONE:New("M01_Zone_M01_WPT3"):GetCoordinate(), nil, nil, 6500)
                 end
             end
@@ -735,6 +729,6 @@
         -- CAPGCI_SYRIA()
         -- CAPGCI_RED()
         -- Spawn_EWR_Red()
-        Auftrag_M01_Red_Tankers()
-        Auftrag_M01_Red_AttackConvoi()
+        -- Auftrag_M01_Red_Tankers()
+        -- Auftrag_M01_Red_AttackConvoi()
         Auftrag_M01_Blue_CAS()
