@@ -1,6 +1,19 @@
+-- Settings MOOSE
+
+_SETTINGS:SetPlayerMenuOff()
+RAT.ATCswitch = false
+
 ---------------------------------------------------------------------------------------------------
 -- MISSION CONSTANTES
 ---------------------------------------------------------------------------------------------------
+
+    --[[ POINTS D'ATTENTION
+
+        EWR Turquey désactivé
+        GCI/CAP Turquey désactivé
+        CAP2 OTAN désactivée
+
+    ]]
 
     -- A désactiver en PROD
 
@@ -24,17 +37,18 @@
 -- INITIALISATIONS
 ---------------------------------------------------------------------------------------------------
 
-    -- Settings MOOSE
-
-    _SETTINGS:SetPlayerMenuOff()
-    RAT.ATCswitch = false
-
-    -- Inits
+    -- DEV
 
     if EnvProd == false then
         MessageToAll("DEVELOPPEMENT", 120)
         TacticalDisplay = true
     end
+
+    -- COMMS
+    local FunRadio = STATIC:FindByName("FunRadio"):GetRadio()
+    FunRadio:SetFrequency(RadioGeneral)
+    FunRadio:SetModulation(radio.modulation.AM)
+    FunRadio:SetPower(1000)
 
     local DANGERZONE = {}
     DANGERZONE.S300 = 125000
@@ -100,9 +114,9 @@
     SAM.Blue.Syria.Aleppo_S300      = GROUP:FindByName("SAM_Blue_Syria_Aleppo_S300"):Activate()
     SAM.Blue.Syria.Palmyra_Hawk     = GROUP:FindByName("SAM_Blue_Syria_Palmyra_Hawk"):Activate()
     SAM.Blue.Syria.Tabqa_S300       = GROUP:FindByName("SAM_Blue_Syria_Tabqa_S300"):Activate()
-    SAM.Blue.Turkey.CB22_S300       = GROUP:FindByName("SAM_Blue_Turkey_CB22_S300"):Activate()
-    SAM.Blue.Turkey.DB30_S300       = GROUP:FindByName("SAM_Blue_Turkey_DB30_S300"):Activate()
-    SAM.Blue.Turkey.IF25_S300       = GROUP:FindByName("SAM_Blue_Turkey_IF25_S300"):Activate()
+    -- SAM.Blue.Turkey.CB22_S300       = GROUP:FindByName("SAM_Blue_Turkey_CB22_S300"):Activate()
+    -- SAM.Blue.Turkey.DB30_S300       = GROUP:FindByName("SAM_Blue_Turkey_DB30_S300"):Activate()
+    -- SAM.Blue.Turkey.IF25_S300       = GROUP:FindByName("SAM_Blue_Turkey_IF25_S300"):Activate()
     SAM.Red.Syria.AlQusayr_Hawk     = GROUP:FindByName("SAM_Red_Syria_AlQusayr_Hawk"):Activate()
     SAM.Red.Syria.Damascus_S300     = GROUP:FindByName("SAM_Red_Syria_Damascus_S300"):Activate()
     SAM.Red.Lebanon.Beirut_Hawk     = GROUP:FindByName("SAM_Red_Lebanon_Beirut_Hawk"):Activate()
@@ -139,11 +153,11 @@
 
     local EWR = {}
 
-    EWR.Red     = SET_GROUP:New():FilterPrefixes({"SAM_Red", "EWR_Red"}):FilterStart()
-    EWR.Israel  = SET_GROUP:New():FilterPrefixes({"SAM_Blue_Israel"}):FilterStart()
-    EWR.OTAN    = SET_GROUP:New():FilterPrefixes({"NAVAL_Blue_Cyprus_OTAN", "AWACS_Blue_OTAN"}):FilterStart()
-    EWR.Turkey  = SET_GROUP:New():FilterPrefixes({"SAM_Blue_Turkey"}):FilterStart()
-    EWR.Syria   = SET_GROUP:New():FilterPrefixes({"SAM_Blue_Syria"}):FilterStart()
+    EWR.Red     = SET_GROUP:New():FilterPrefixes({"SAM_Red", "EWR_Red"}):FilterStart():FilterStop()
+    EWR.Israel  = SET_GROUP:New():FilterPrefixes({"SAM_Blue_Israel"}):FilterStart():FilterStop()
+    EWR.OTAN    = SET_GROUP:New():FilterPrefixes({"NAVAL_Blue_Cyprus_OTAN", "AWACS_Blue_OTAN"}):FilterStart():FilterStop()
+    EWR.Turkey  = SET_GROUP:New():FilterPrefixes({"SAM_Blue_Turkey"}):FilterStart():FilterStop()
+    EWR.Syria   = SET_GROUP:New():FilterPrefixes({"SAM_Blue_Syria"}):FilterStart():FilterStop()
 
     -- WindsInverter
 
@@ -379,6 +393,12 @@
             A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP1", 1000, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 800, 4000, 8000, "RADIO")
             A2ADispatcherOTAN:SetSquadronCapInterval("OTAN CAP1", 1, 60, 120, 1)
             A2ADispatcherOTAN:SetSquadronGrouping("OTAN CAP1", 2)
+            -- CAP 2
+            -- A2ADispatcherOTAN:SetSquadron("OTAN CAP2", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"CAP_Blue_OTAN"}, 4)
+            -- A2ADispatcherOTAN:SetSquadronTakeoffFromParkingHot("OTAN CAP2")
+            -- A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP2", 1000, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 800, 4000, 8000, "RADIO")
+            -- A2ADispatcherOTAN:SetSquadronCapInterval("OTAN CAP2", 1, 60, 120, 1)
+            -- A2ADispatcherOTAN:SetSquadronGrouping("OTAN CAP2", 2)
             -- GCI
             A2ADispatcherOTAN:SetSquadron("OTAN GCI", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"GCI_Blue_OTAN"}, 2)
             A2ADispatcherOTAN:SetSquadronTakeoffFromParkingHot("OTAN GCI")
@@ -541,13 +561,13 @@
             )
         end
 
-    -- RED Su-24
+    -- RED Su24
 
         function Auftrag_M01_Red_AttackConvoi ()
 
             -- AUFTRAG ORBIT
-            local auftragOrbit = AUFTRAG:NewORBIT_CIRCLE(ZONE:New("M01_Zone_M01_WPT1"):GetCoordinate(), 15000, 350)
-            auftragOrbit:SetMissionAltitude(15000)
+            local auftragOrbit = AUFTRAG:NewORBIT_CIRCLE(ZONE:New("M01_Zone_M01_WPT1"):GetCoordinate(), 7000, 350)
+            auftragOrbit:SetMissionAltitude(7000)
             auftragOrbit:SetMissionSpeed(350)
 
             -- AUFTRAG BOMBING
@@ -558,12 +578,11 @@
             auftragBombing:SetWeaponType(ENUMS.WeaponFlag.AnyUnguided)
             auftragBombing:SetMissionWaypointCoord(ZONE:New("M01_Zone_M01_IP"):GetCoordinate())
             auftragBombing:SetMissionAltitude(3000)
-            auftragBombing:SetEngageAltitude(3000)
-            auftragBombing:SetMissionSpeed(350)
+            auftragBombing:SetEngageAltitude(2000)
+            auftragBombing:SetMissionSpeed(300)
 
             -- FLIGHTGROUP
             local bomber = FLIGHTGROUP:New("M01_Red_Su24")
-            bomber:SwitchRadio(RadioGeneral, radio.modulation.AM)
             bomber:SetDefaultCallsign(CALLSIGN.Aircraft.Uzi, 9)
             bomber:SetDefaultFormation(ENUMS.Formation.FixedWing.FighterVic.Close)
             bomber:AddMission(auftragOrbit)
@@ -571,26 +590,42 @@
             bomber:HandleEvent(EVENTS.Shot)
             bomber:Activate()
 
+            -- EVENTS SUR PASSAGE WAYPOINTS
             function bomber:OnAfterPassingWaypoint (From, Event, To, Waypoint)
                 if Waypoint.uid == 2 then
+                    -- Orbit Start
+                    MessageToAll("ON STATION", 5)
+                    FunRadio:NewGenericTransmission("Guns_1.ogg", RadioGeneral):Broadcast()
                     MenuCommandStartMissionBombing = MENU_COALITION_COMMAND:New(coalition.side.RED, "Démarrage Mission Su-24", nil, function ()
                         MenuCommandStartMissionBombing:Remove()
                         auftragOrbit:Cancel()
                     end, nil)
                 elseif Waypoint.uid == 3 then
                     bomber:SwitchFormation(ENUMS.Formation.FixedWing.Trail.Close)
+                elseif Waypoint.uid == 5 then
+                    -- IP
+                    MessageToAll("IP", 5)
+                    FunRadio:NewGenericTransmission("Guns_1.ogg", RadioGeneral):Broadcast()
                 end
             end
 
+            -- EVENT AFTER ORBIT
             function auftragOrbit:OnAfterDone (From, Event, To)
                 for _,opsgroup in pairs(auftragBombing:GetOpsGroups()) do
                     local flightgroup = opsgroup
-                    flightgroup:AddWaypoint(ZONE:New("M01_Zone_M01_WPT2"):GetCoordinate(), nil, nil, 6500)
-                    flightgroup:AddWaypoint(ZONE:New("M01_Zone_M01_WPT3"):GetCoordinate(), nil, nil, 6500)
+                    flightgroup:AddWaypoint(ZONE:New("M01_Zone_M01_WPT2"):GetCoordinate(), nil, nil, 7000)
+                    flightgroup:AddWaypoint(ZONE:New("M01_Zone_M01_WPT3"):GetCoordinate(), nil, nil, 3000)
                 end
             end
 
+            -- EVENT AFTER BOMBING
             function auftragBombing:OnAfterDone (From,Event,To)
+                MessageToAll("BOMBING DONE", 5)
+                BASE:ScheduleOnce(30,
+                    function ()
+                        MessageToAll("RTB", 5)
+                    end
+                )
                 for _,opsgroup in pairs(auftragBombing:GetOpsGroups()) do
                     local flightgroup = opsgroup
                     flightgroup:SwitchFormation(ENUMS.Formation.FixedWing.FighterVic.Close)
@@ -598,7 +633,7 @@
                 end
             end
 
-            -- BREVITY Su-24
+            -- BREVITY Ripple Su24 Units
             SET_UNIT:New():FilterPrefixes("M01_Red_Su24"):FilterStart():FilterStop():ForEachUnit(
                 function (unit)
                     unit:HandleEvent(EVENTS.Shot)
@@ -606,11 +641,7 @@
                         local WeaponDesc = EventData.Weapon:getDesc()
                         if WeaponDesc.category == 3 then
                             local Brevity = "Ripple_" .. math.random(2) .. ".ogg"
-                            local UnitRadio = unit:GetRadio()
-                            UnitRadio:SetFileName(Brevity)
-                            UnitRadio:SetFrequency(RadioGeneral)
-                            UnitRadio:SetModulation(radio.modulation.AM)
-                            UnitRadio:Broadcast()
+                            FunRadio:NewGenericTransmission(Brevity, RadioGeneral):Broadcast()
                             unit:UnHandleEvent(EVENTS.Shot)
                         end
                     end
@@ -723,12 +754,14 @@
 
     -- Executions
 
+        -- CAPGCI_TURKEY()
+
         -- CAPGCI_OTAN()
         -- CAPGCI_ISRAEL()
-        -- CAPGCI_TURKEY()
         -- CAPGCI_SYRIA()
         -- CAPGCI_RED()
         -- Spawn_EWR_Red()
         -- Auftrag_M01_Red_Tankers()
         -- Auftrag_M01_Red_AttackConvoi()
-        Auftrag_M01_Blue_CAS()
+        Auftrag_M01_Red_AttackConvoi()
+        -- Auftrag_M01_Blue_CAS()

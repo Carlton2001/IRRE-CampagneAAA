@@ -1,8 +1,8 @@
-Setime20 minutes
+Blue Attack Setime20 minutes
+-- SAM / GCI/CAP TURQUEY désactivés
+-- Su-24 6000 pieds max
 
-Su-24 6000 pieds max
-
-Zone Rayak Message radio
+-- Zone Rayak Message radio
 Zone Convoi Crackage fumi + Message radio
 
 smoke verte sur scheduler 300 secondes
