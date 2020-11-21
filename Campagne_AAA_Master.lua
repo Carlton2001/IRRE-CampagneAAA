@@ -566,7 +566,7 @@ RAT.ATCswitch = false
         function Auftrag_M01_Red_AttackConvoi ()
 
             -- AUFTRAG ORBIT
-            local auftragOrbit = AUFTRAG:NewORBIT_CIRCLE(ZONE:New("M01_Zone_M01_WPT1"):GetCoordinate(), 7000, 350)
+            local auftragOrbit = AUFTRAG:NewORBIT_CIRCLE(ZONE:New("M01_Zone_WPT1"):GetCoordinate(), 7000, 350)
             auftragOrbit:SetMissionAltitude(7000)
             auftragOrbit:SetMissionSpeed(350)
 
@@ -576,7 +576,7 @@ RAT.ATCswitch = false
             auftragBombing:SetROT(ENUMS.ROT.NoReaction)
             auftragBombing:SetWeaponExpend(AI.Task.WeaponExpend.ALL)
             auftragBombing:SetWeaponType(ENUMS.WeaponFlag.AnyUnguided)
-            auftragBombing:SetMissionWaypointCoord(ZONE:New("M01_Zone_M01_IP"):GetCoordinate())
+            auftragBombing:SetMissionWaypointCoord(ZONE:New("M01_Zone_IP"):GetCoordinate())
             auftragBombing:SetMissionAltitude(3000)
             auftragBombing:SetEngageAltitude(2000)
             auftragBombing:SetMissionSpeed(300)
@@ -613,8 +613,8 @@ RAT.ATCswitch = false
             function auftragOrbit:OnAfterDone (From, Event, To)
                 for _,opsgroup in pairs(auftragBombing:GetOpsGroups()) do
                     local flightgroup = opsgroup
-                    flightgroup:AddWaypoint(ZONE:New("M01_Zone_M01_WPT2"):GetCoordinate(), nil, nil, 7000)
-                    flightgroup:AddWaypoint(ZONE:New("M01_Zone_M01_WPT3"):GetCoordinate(), nil, nil, 3000)
+                    flightgroup:AddWaypoint(ZONE:New("M01_Zone_WPT2"):GetCoordinate(), nil, nil, 7000)
+                    flightgroup:AddWaypoint(ZONE:New("M01_Zone_WPT3"):GetCoordinate(), nil, nil, 3000)
                 end
             end
 
@@ -740,15 +740,50 @@ RAT.ATCswitch = false
             local TargetB = GROUP:FindByName("M01_Red_ConvoiB"):Activate()
             SchedulerConvoisRed = SCHEDULER:New( nil,
                 function ()
-                    if not TargetA:IsAlive() and not TargetB:IsAlive() then
-                        Blue_Auftrag_Su25_CAS:Cancel()
-                        Blue_Auftrag_L39_CAS:Cancel()
-                        Blue_Auftrag_Hind_CAS:Cancel()
-                        Blue_Auftrag_Mi8_CAS:Cancel()
-                        SchedulerConvoisRed:Stop()
+                    if AIR.Red.All:CountAlive() >= 1 then
+                        if not TargetA:IsAlive() and not TargetB:IsAlive() then
+                            Blue_Auftrag_Su25_CAS:Cancel()
+                            Blue_Auftrag_L39_CAS:Cancel()
+                            Blue_Auftrag_Hind_CAS:Cancel()
+                            Blue_Auftrag_Mi8_CAS:Cancel()
+                            SchedulerConvoisRed:Stop()
+                        end
                     end
                 end, {}, 1, 30
             )
+
+        end
+
+    -- Red Convois
+
+        function Management_M01_Convois ()
+
+            local TargetA = GROUP:FindByName("M01_Red_ConvoiA"):Activate()
+            local TargetB = GROUP:FindByName("M01_Red_ConvoiB"):Activate()
+
+            local ZoneFumi = ZONE:New("M01_Zone_Fumi")
+
+            SchedulerSmoke_Status = false
+            function RepeatSmoke ()
+                MessageToAll("Test Smoke", 5)
+                if AIR.Red.All:AnyInZone(ZoneFumi) and SchedulerSmoke_Status == false then
+                    SchedulerSmoke_Status = true
+                    SchedulerSmoke = SCHEDULER:New(nil,
+                        function()
+                            MessageToAll("Start / Repeat Smoke", 5)
+                            TargetA:GetCoordinate():SmokeGreen()
+                            TargetB:GetCoordinate():SmokeGreen()
+                        end, {}, 1, 300
+                    )
+                elseif AIR.Red.All:NoneInZone(ZoneFumi) and SchedulerSmoke_Status == true then
+                    MessageToAll("Stopping Smoke", 5)
+                    SchedulerSmoke_Status = false
+                    SchedulerSmoke:Stop()
+                    SchedulerStartSmoke:Start()
+                end
+            end
+
+            SchedulerStartSmoke = SCHEDULER:New(nil, RepeatSmoke, {}, 1, 10)
 
         end
 
@@ -763,5 +798,5 @@ RAT.ATCswitch = false
         -- Spawn_EWR_Red()
         -- Auftrag_M01_Red_Tankers()
         -- Auftrag_M01_Red_AttackConvoi()
-        Auftrag_M01_Red_AttackConvoi()
         -- Auftrag_M01_Blue_CAS()
+        Management_M01_Convois()
