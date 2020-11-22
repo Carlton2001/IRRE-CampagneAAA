@@ -1,0 +1,5 @@
+--cancel msg su24 si dead
+--annonces fuel si airborne only
+--Supprimer le délai pour la CAS
+--Remplacer le Tunguska
+--trop de strykers dans le convoi

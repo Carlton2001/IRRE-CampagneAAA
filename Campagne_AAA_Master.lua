@@ -325,7 +325,7 @@ RAT.ATCswitch = false
             -- TANKER ESCORT
             if ESCORT then
                 BASE:E(ESCORT.Name)
-                local MissionEscort = AUFTRAG:NewESCORT(Tanker:GetGroup(), nil, 50000)
+                local MissionEscort = AUFTRAG:NewESCORT(Tanker:GetGroup(), nil, 30)
                 local Escort = FLIGHTGROUP:New(ESCORT.Name)
                 Escort:SetDefaultFormation(ENUMS.Formation.FixedWing.FighterVic.Close)
                 Escort:SetDefaultCallsign(ESCORT.Callsign, ESCORT.CallsignNumber)
@@ -333,7 +333,9 @@ RAT.ATCswitch = false
                 Escort:SetFuelLowRefuel(true)
                 Escort:AddMission(MissionEscort)
             end
-            -- TANKER DUEL STATUS
+        end
+        -- TANKER FUEL STATUS
+        function Tanker:onafterAirborne (From, Event, To)
             local SchedulerTanker = SCHEDULER:New( nil, TankerFuelStatus, {GroupName, COMMS, TANKERTYPE.Fuel, FuelLow/100}, 1, 30)
         end
     end
@@ -645,16 +647,18 @@ RAT.ATCswitch = false
 
             -- EVENT AFTER BOMBING
             function auftragBombing:OnAfterDone (From,Event,To)
-                MessageToAll("SU-24 : BOMBING DONE", 5)
-                BASE:ScheduleOnce(30,
-                    function ()
-                        MessageToAll("SU-24 : RTB", 5)
-                    end
-                )
                 for _,opsgroup in pairs(auftragBombing:GetOpsGroups()) do
                     local flightgroup = opsgroup
-                    flightgroup:SwitchFormation(ENUMS.Formation.FixedWing.FighterVic.Close)
-                    flightgroup:RTB(AIRBASE:FindByName(AIRBASE.Syria.Mezzeh))
+                    if flightgroup:IsAlive() then
+                        MessageToAll("SU-24 : BOMBING DONE", 5)
+                        BASE:ScheduleOnce(30,
+                            function ()
+                                MessageToAll("SU-24 : RTB", 5)
+                            end
+                        )
+                        flightgroup:SwitchFormation(ENUMS.Formation.FixedWing.FighterVic.Close)
+                        flightgroup:RTB(AIRBASE:FindByName(AIRBASE.Syria.Mezzeh))
+                    end
                 end
             end
 
@@ -729,7 +733,6 @@ RAT.ATCswitch = false
             Blue_Auftrag_Su25_CAS:SetROT(ENUMS.ROT.BypassAndEscape)
             Blue_Auftrag_Su25_CAS:SetMissionSpeed(350)
             Blue_Auftrag_Su25_CAS:SetEngageAltitude(2000)
-            Blue_Auftrag_Su25_CAS:SetTime(600)
             Blue_Auftrag_Su25_CAS:SetRepeat(3)
 
             local Blue_Auftrag_L39_CAS = AUFTRAG:NewCAS(ZONE:New('M01_ZoneBlueCAS'), 5000, 350)
@@ -737,7 +740,6 @@ RAT.ATCswitch = false
             Blue_Auftrag_L39_CAS:SetROT(ENUMS.ROT.BypassAndEscape)
             Blue_Auftrag_L39_CAS:SetMissionSpeed(350)
             Blue_Auftrag_L39_CAS:SetEngageAltitude(2000)
-            Blue_Auftrag_L39_CAS:SetTime(600)
             Blue_Auftrag_L39_CAS:SetRepeat(3)
 
             local Blue_Auftrag_Hind_CAS = AUFTRAG:NewCAS(ZONE:New('M01_ZoneBlueCAS'), 2000, 150)
@@ -745,7 +747,6 @@ RAT.ATCswitch = false
             Blue_Auftrag_Hind_CAS:SetROT(ENUMS.ROT.BypassAndEscape)
             Blue_Auftrag_Hind_CAS:SetMissionSpeed(150)
             Blue_Auftrag_Hind_CAS:SetEngageAltitude(1500)
-            Blue_Auftrag_Hind_CAS:SetTime(300)
             Blue_Auftrag_Hind_CAS:SetRepeat(2)
 
             local Blue_Auftrag_Mi8_CAS = AUFTRAG:NewCAS(ZONE:New('M01_ZoneBlueCAS'), 2000, 150)
@@ -753,7 +754,6 @@ RAT.ATCswitch = false
             Blue_Auftrag_Mi8_CAS:SetROT(ENUMS.ROT.BypassAndEscape)
             Blue_Auftrag_Mi8_CAS:SetMissionSpeed(150)
             Blue_Auftrag_Mi8_CAS:SetEngageAltitude(1500)
-            Blue_Auftrag_Mi8_CAS:SetTime(300)
             Blue_Auftrag_Mi8_CAS:SetRepeat(2)
 
             -- Affectations Auftrags
