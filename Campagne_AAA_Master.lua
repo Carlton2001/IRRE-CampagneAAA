@@ -17,7 +17,7 @@ RAT.ATCswitch = false
 
     -- A désactiver en PROD
 
-    local EnvProd = false
+    local EnvProd = true
 
     -- Fréquences Radio - Attention Callsigns & Radios du EWR et des GCI/CAP à paramétrer dans l'EM
 
@@ -704,6 +704,7 @@ RAT.ATCswitch = false
             Blue_Auftrag_Su25_CAS:SetROT(ENUMS.ROT.BypassAndEscape)
             Blue_Auftrag_Su25_CAS:SetMissionSpeed(350)
             Blue_Auftrag_Su25_CAS:SetEngageAltitude(2000)
+            Blue_Auftrag_Su25_CAS:SetTime(600)
             Blue_Auftrag_Su25_CAS:SetRepeat(3)
 
             local Blue_Auftrag_L39_CAS = AUFTRAG:NewCAS(ZONE:New('M01_ZoneBlueCAS'), 5000, 350)
@@ -711,6 +712,7 @@ RAT.ATCswitch = false
             Blue_Auftrag_L39_CAS:SetROT(ENUMS.ROT.BypassAndEscape)
             Blue_Auftrag_L39_CAS:SetMissionSpeed(350)
             Blue_Auftrag_L39_CAS:SetEngageAltitude(2000)
+            Blue_Auftrag_L39_CAS:SetTime(600)
             Blue_Auftrag_L39_CAS:SetRepeat(3)
 
             local Blue_Auftrag_Hind_CAS = AUFTRAG:NewCAS(ZONE:New('M01_ZoneBlueCAS'), 2000, 150)
@@ -718,6 +720,7 @@ RAT.ATCswitch = false
             Blue_Auftrag_Hind_CAS:SetROT(ENUMS.ROT.BypassAndEscape)
             Blue_Auftrag_Hind_CAS:SetMissionSpeed(150)
             Blue_Auftrag_Hind_CAS:SetEngageAltitude(1500)
+            Blue_Auftrag_Hind_CAS:SetTime(300)
             Blue_Auftrag_Hind_CAS:SetRepeat(2)
 
             local Blue_Auftrag_Mi8_CAS = AUFTRAG:NewCAS(ZONE:New('M01_ZoneBlueCAS'), 2000, 150)
@@ -725,6 +728,7 @@ RAT.ATCswitch = false
             Blue_Auftrag_Mi8_CAS:SetROT(ENUMS.ROT.BypassAndEscape)
             Blue_Auftrag_Mi8_CAS:SetMissionSpeed(150)
             Blue_Auftrag_Mi8_CAS:SetEngageAltitude(1500)
+            Blue_Auftrag_Mi8_CAS:SetTime(300)
             Blue_Auftrag_Mi8_CAS:SetRepeat(2)
 
             -- Affectations Auftrags
@@ -734,27 +738,28 @@ RAT.ATCswitch = false
             Blue_Airwing_Su25:AddMission(Blue_Auftrag_Su25_CAS)
             Blue_Airwing_L39:AddMission(Blue_Auftrag_L39_CAS)
 
-            -- RED Convois
+            -- Cancel sur Mort des RED Convois
 
-            local TargetA = GROUP:FindByName("M01_Red_ConvoiA"):Activate()
-            local TargetB = GROUP:FindByName("M01_Red_ConvoiB"):Activate()
-            SchedulerConvoisRed = SCHEDULER:New( nil,
-                function ()
-                    if AIR.Red.All:CountAlive() >= 1 then
-                        if not TargetA:IsAlive() and not TargetB:IsAlive() then
-                            Blue_Auftrag_Su25_CAS:Cancel()
-                            Blue_Auftrag_L39_CAS:Cancel()
-                            Blue_Auftrag_Hind_CAS:Cancel()
-                            Blue_Auftrag_Mi8_CAS:Cancel()
-                            SchedulerConvoisRed:Stop()
+            local TargetA = GROUP:FindByName("M01_Red_ConvoiA")
+            local TargetB = GROUP:FindByName("M01_Red_ConvoiB")
+            if TargetA:IsAlive() and TargetB:IsAlive() then
+                SchedulerConvoisRed = SCHEDULER:New( nil,
+                    function ()
+                        if AIR.Red.All:CountAlive() >= 1 then
+                            if not TargetA:IsAlive() and not TargetB:IsAlive() then
+                                Blue_Auftrag_Su25_CAS:Cancel()
+                                Blue_Auftrag_L39_CAS:Cancel()
+                                Blue_Auftrag_Hind_CAS:Cancel()
+                                Blue_Auftrag_Mi8_CAS:Cancel()
+                                SchedulerConvoisRed:Stop()
+                            end
                         end
-                    end
-                end, {}, 1, 30
-            )
-
+                    end, {}, 1, 30
+                )
+            end
         end
 
-    -- Red Convois
+    -- RED Convois
 
         function Management_M01_Convois ()
 
@@ -789,6 +794,8 @@ RAT.ATCswitch = false
 
     -- Executions
 
+        -- Configuration Generale
+
         -- CAPGCI_TURKEY()
 
         -- CAPGCI_OTAN()
@@ -796,7 +803,10 @@ RAT.ATCswitch = false
         -- CAPGCI_SYRIA()
         -- CAPGCI_RED()
         -- Spawn_EWR_Red()
-        -- Auftrag_M01_Red_Tankers()
-        -- Auftrag_M01_Red_AttackConvoi()
-        -- Auftrag_M01_Blue_CAS()
-        Management_M01_Convois()
+
+        -- Configuration spécifique M01
+
+        -- Auftrag_M01_Red_Tankers() -- Lancement des Tankers Rouges
+        -- Auftrag_M01_Red_AttackConvoi() -- Lancement des Su-24 sur les Camions Bleus qui pillent le train
+        Management_M01_Convois() -- Démarrage des convois Rouges et gestîon des fumis/radios
+        Auftrag_M01_Blue_CAS() -- Lancement de la CAS Rouge sur nos Convois
