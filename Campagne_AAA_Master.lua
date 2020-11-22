@@ -145,6 +145,7 @@ RAT.ATCswitch = false
 
     AIR.Red.All             = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterStart()
     AIR.Red.GCICAP          = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterPrefixes{"CAP_Red", "GCI_Red"}:FilterStart()
+    AIR.Red.Players         = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterPrefixes{"Cli_"}:FilterStart()
     AIR.Blue.All            = SET_GROUP:New():FilterCoalitions("blue"):FilterCategoryAirplane():FilterStart()
     AIR.Blue.IsraelOTAN     = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(COUNTRY.IsraelOTAN):FilterCategoryAirplane():FilterStart()
     AIR.Blue.TurkeySyria    = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(COUNTRY.TurkeySyria):FilterCategoryAirplane():FilterStart()
@@ -538,6 +539,16 @@ RAT.ATCswitch = false
 -- MISSION 01
 ---------------------------------------------------------------------------------------------------
 
+    -- RED Ambiance
+
+            -- AUFTRAG ORBIT
+            local auftragOrbitAmbiance = AUFTRAG:NewORBIT_CIRCLE(ZONE:New("ZONE_Ambiance-1"):GetCoordinate(), 3000, 100)
+            -- FLIGHTGROUP
+            local Ambiance_Red_Mi8 = FLIGHTGROUP:New("Ambiance_Red_Mi8")
+            Ambiance_Red_Mi8:SetDefaultFormation(ENUMS.Formation.RotaryWing.EchelonRight.D70)
+            Ambiance_Red_Mi8:AddMission(auftragOrbitAmbiance)
+            Ambiance_Red_Mi8:Activate()
+
     -- RED EWR
 
         function Spawn_EWR_Red ()
@@ -551,14 +562,28 @@ RAT.ATCswitch = false
             LaunchTanker (
                 "TANKER_Red_IL78", -- GroupName
                 TANKER.IL78, -- TANKERTYPE
-                {["ZoneName"] = "ZONE_Tanker_Red", ["Altitude"] = 20000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
+                {["ZoneName"] = "ZONE_Tanker_Red-1", ["Altitude"] = 20000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
                 {["Frequency"] = RadioTanker2, ["Callsign"] = CALLSIGN.Tanker.Arco}, -- COMMS
                 AIRBASE.Syria.Damascus, -- HomeBase
-                {["Channel"] = 11, ["Morse"] = "ARC", ["Band"] = "Y"}, -- TACAN
+                {["Channel"] = 12, ["Morse"] = "ARC", ["Band"] = "Y"}, -- TACAN
                 10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
                 10, -- DepartureTime (s)
-                {["Name"] = "Escort_Red", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 1} -- ESCORT
+                {["Name"] = "Escort_Red_Tanker1", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 2} -- ESCORT
             )
+
+            -- Shell
+            LaunchTanker (
+                "TANKER_Red_KC135", -- GroupName
+                TANKER.KC135, -- TANKERTYPE
+                {["ZoneName"] = "ZONE_Tanker_Red-2", ["Altitude"] = 22000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
+                {["Frequency"] = RadioTanker3, ["Callsign"] = CALLSIGN.Tanker.Shell}, -- COMMS
+                AIRBASE.Syria.Damascus, -- HomeBase
+                {["Channel"] = 13, ["Morse"] = "SHL", ["Band"] = "Y"}, -- TACAN
+                10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
+                10, -- DepartureTime (s)
+                {["Name"] = "Escort_Red_Tanker2", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 3} -- ESCORT
+            )
+
         end
 
     -- RED Su24
@@ -796,17 +821,34 @@ RAT.ATCswitch = false
 
         -- Configuration Generale
 
-        -- CAPGCI_TURKEY()
+            -- CAPGCI_TURKEY()
 
-        -- CAPGCI_OTAN()
-        -- CAPGCI_ISRAEL()
-        -- CAPGCI_SYRIA()
-        -- CAPGCI_RED()
-        -- Spawn_EWR_Red()
+            -- CAPGCI_OTAN()
+            -- CAPGCI_ISRAEL()
+            -- CAPGCI_SYRIA()
+            -- CAPGCI_RED()
+            -- Spawn_EWR_Red()
 
-        -- Configuration spécifique M01
+        -- Déroulé de M01
 
-        -- Auftrag_M01_Red_Tankers() -- Lancement des Tankers Rouges
-        -- Auftrag_M01_Red_AttackConvoi() -- Lancement des Su-24 sur les Camions Bleus qui pillent le train
-        Management_M01_Convois() -- Démarrage des convois Rouges et gestîon des fumis/radios
-        Auftrag_M01_Blue_CAS() -- Lancement de la CAS Rouge sur nos Convois
+            local ZoneWPT1 = ZONE:New("M01_Zone_WPT1")
+
+            -- Démarrage serveur
+            Auftrag_M01_Red_Tankers() -- Lancement des Tankers Rouges
+
+            -- Players arrivent sur WP1
+
+            SchedulerWPT1 = SCHEDULER:New(nil,
+                function()
+                    if AIR.Red.Players:AnyInZone(ZoneWPT1) then
+                        MessageToAll("FIGHT !", 5)
+
+                        Management_M01_Convois() -- Démarrage des convois Rouges et gestîon des fumis/radios
+                        Auftrag_M01_Blue_CAS() -- Lancement de la CAS Rouge sur nos Convois
+                        Auftrag_M01_Red_AttackConvoi() -- Lancement des Su-24 sur les Camions Bleus qui pillent le train
+
+                        SchedulerWPT1:Stop()
+                    end
+                end, {}, 1, 10
+            )
+
