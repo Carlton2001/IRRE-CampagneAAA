@@ -619,7 +619,7 @@ RAT.ATCswitch = false
             function bomber:OnAfterPassingWaypoint (From, Event, To, Waypoint)
                 if Waypoint.uid == 2 then
                     -- Orbit Start
-                    MessageToAll("ON STATION", 5)
+                    MessageToAll("SU-24 : ON STATION RAYAK", 5)
                     FunRadio:NewGenericTransmission("Guns_1.ogg", RadioGeneral):Broadcast()
                     MenuCommandStartMissionBombing = MENU_COALITION_COMMAND:New(coalition.side.RED, "Démarrage Mission Su-24", nil, function ()
                         MenuCommandStartMissionBombing:Remove()
@@ -629,7 +629,7 @@ RAT.ATCswitch = false
                     bomber:SwitchFormation(ENUMS.Formation.FixedWing.Trail.Close)
                 elseif Waypoint.uid == 5 then
                     -- IP
-                    MessageToAll("IP", 5)
+                    MessageToAll("SU-24 : IP", 5)
                     FunRadio:NewGenericTransmission("Guns_1.ogg", RadioGeneral):Broadcast()
                 end
             end
@@ -645,10 +645,10 @@ RAT.ATCswitch = false
 
             -- EVENT AFTER BOMBING
             function auftragBombing:OnAfterDone (From,Event,To)
-                MessageToAll("BOMBING DONE", 5)
+                MessageToAll("SU-24 : BOMBING DONE", 5)
                 BASE:ScheduleOnce(30,
                     function ()
-                        MessageToAll("RTB", 5)
+                        MessageToAll("SU-24 : RTB", 5)
                     end
                 )
                 for _,opsgroup in pairs(auftragBombing:GetOpsGroups()) do
@@ -795,18 +795,17 @@ RAT.ATCswitch = false
 
             SchedulerSmoke_Status = false
             function RepeatSmoke ()
-                MessageToAll("Test Smoke", 5)
                 if AIR.Red.All:AnyInZone(ZoneFumi) and SchedulerSmoke_Status == false then
                     SchedulerSmoke_Status = true
                     SchedulerSmoke = SCHEDULER:New(nil,
                         function()
-                            MessageToAll("Start / Repeat Smoke", 5)
+                            MessageToAll("RED CONVOIS : Start / Repeat Smoke", 5)
                             TargetA:GetCoordinate():SmokeGreen()
                             TargetB:GetCoordinate():SmokeGreen()
                         end, {}, 1, 300
                     )
                 elseif AIR.Red.All:NoneInZone(ZoneFumi) and SchedulerSmoke_Status == true then
-                    MessageToAll("Stopping Smoke", 5)
+                    MessageToAll("RED CONVOIS : Stopping Smoke", 5)
                     SchedulerSmoke_Status = false
                     SchedulerSmoke:Stop()
                     SchedulerStartSmoke:Start()
@@ -823,11 +822,11 @@ RAT.ATCswitch = false
 
             -- CAPGCI_TURKEY()
 
-            -- CAPGCI_OTAN()
-            -- CAPGCI_ISRAEL()
-            -- CAPGCI_SYRIA()
-            -- CAPGCI_RED()
-            -- Spawn_EWR_Red()
+            CAPGCI_OTAN()
+            CAPGCI_ISRAEL()
+            CAPGCI_SYRIA()
+            CAPGCI_RED()
+            Spawn_EWR_Red()
 
         -- Déroulé de M01
 
@@ -841,12 +840,10 @@ RAT.ATCswitch = false
             SchedulerWPT1 = SCHEDULER:New(nil,
                 function()
                     if AIR.Red.Players:AnyInZone(ZoneWPT1) then
-                        MessageToAll("FIGHT !", 5)
-
+                        MessageToAll("DECLENCHEMENT Convois / Blue CAS / Su-24", 5)
                         Management_M01_Convois() -- Démarrage des convois Rouges et gestîon des fumis/radios
                         Auftrag_M01_Blue_CAS() -- Lancement de la CAS Rouge sur nos Convois
                         Auftrag_M01_Red_AttackConvoi() -- Lancement des Su-24 sur les Camions Bleus qui pillent le train
-
                         SchedulerWPT1:Stop()
                     end
                 end, {}, 1, 10
