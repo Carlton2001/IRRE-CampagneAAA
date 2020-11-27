@@ -22,9 +22,10 @@ RAT.ATCswitch = false
     -- Fréquences Radio - Attention Callsigns & Radios du EWR et des GCI/CAP à paramétrer dans l'EM
 
     local RadioGeneral = 305.00
-    local RadioTanker1 = 260.00 -- Texaco
-    local RadioTanker2 = 265.00 -- Arco
-    local RadioTanker3 = 266.00 -- Shell
+    local RadioTanker1 = 283.00 -- Texaco (KC130)
+    local RadioTanker2 = 289.00 -- Arco (IL78)
+    local RadioTanker3 = 272.00 -- Shell (KC135)
+    local RadioTanker4 = 269.00 -- Texaco2 (KC135MPRS)
 
     -- Direction des vents (cf ME)
 
@@ -560,30 +561,57 @@ RAT.ATCswitch = false
     -- RED Tankers
 
         function Auftrag_M01_Red_Tankers ()
-            -- Arco
+
+            -- Texaco KC130
+            LaunchTanker (
+                "TANKER_Red_KC130", -- GroupName
+                TANKER.KC130, -- TANKERTYPE
+                {["ZoneName"] = "ZONE_Tanker_Red-1", ["Altitude"] = 18000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
+                {["Frequency"] = RadioTanker1, ["Callsign"] = CALLSIGN.Tanker.Texaco}, -- COMMS
+                AIRBASE.Syria.Damascus, -- HomeBase
+                {["Channel"] = 28, ["Morse"] = "TEX", ["Band"] = "Y"}, -- TACAN
+                10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
+                10, -- DepartureTime (s)
+                {["Name"] = "Escort_Red_Tanker1", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 6} -- ESCORT
+            )
+
+            -- Arco IL78
             LaunchTanker (
                 "TANKER_Red_IL78", -- GroupName
                 TANKER.IL78, -- TANKERTYPE
                 {["ZoneName"] = "ZONE_Tanker_Red-1", ["Altitude"] = 20000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
                 {["Frequency"] = RadioTanker2, ["Callsign"] = CALLSIGN.Tanker.Arco}, -- COMMS
                 AIRBASE.Syria.Damascus, -- HomeBase
-                {["Channel"] = 12, ["Morse"] = "ARC", ["Band"] = "Y"}, -- TACAN
+                {["Channel"] = 25, ["Morse"] = "ARC", ["Band"] = "Y"}, -- TACAN
                 10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
                 10, -- DepartureTime (s)
-                {["Name"] = "Escort_Red_Tanker1", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 2} -- ESCORT
+                {["Name"] = "Escort_Red_Tanker1", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 7} -- ESCORT
             )
 
-            -- Shell
+            -- Shell KC135
             LaunchTanker (
                 "TANKER_Red_KC135", -- GroupName
                 TANKER.KC135, -- TANKERTYPE
-                {["ZoneName"] = "ZONE_Tanker_Red-2", ["Altitude"] = 22000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
+                {["ZoneName"] = "ZONE_Tanker_Red-2", ["Altitude"] = 18000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
                 {["Frequency"] = RadioTanker3, ["Callsign"] = CALLSIGN.Tanker.Shell}, -- COMMS
                 AIRBASE.Syria.Damascus, -- HomeBase
-                {["Channel"] = 13, ["Morse"] = "SHL", ["Band"] = "Y"}, -- TACAN
+                {["Channel"] = 34, ["Morse"] = "SHL", ["Band"] = "Y"}, -- TACAN
                 10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
                 10, -- DepartureTime (s)
-                {["Name"] = "Escort_Red_Tanker2", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 3} -- ESCORT
+                {["Name"] = "Escort_Red_Tanker2", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 8} -- ESCORT
+            )
+
+            -- Texaco KC135MPRS
+            LaunchTanker (
+                "TANKER_Red_KC135MPRS", -- GroupName
+                TANKER.KC135MPRS, -- TANKERTYPE
+                {["ZoneName"] = "ZONE_Tanker_Red-2", ["Altitude"] = 20000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
+                {["Frequency"] = RadioTanker4, ["Callsign"] = CALLSIGN.Tanker.Texaco}, -- COMMS
+                AIRBASE.Syria.Damascus, -- HomeBase
+                {["Channel"] = 39, ["Morse"] = "TEX", ["Band"] = "Y"}, -- TACAN
+                10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
+                10, -- DepartureTime (s)
+                {["Name"] = "Escort_Red_Tanker2", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 9} -- ESCORT
             )
 
         end
@@ -702,7 +730,7 @@ RAT.ATCswitch = false
             local Blue_Squadron_Mi8 = SQUADRON:New("M01_Blue_Mi8", 2, "Blue_Squadron_Mi8")
             Blue_Squadron_Mi8:AddMissionCapability({AUFTRAG.Type.CAS})
             Blue_Squadron_Mi8:SetSkill(AI.Skill.HIGH)
-            Blue_Squadron_Mi8:SetLivery("IRRE_AAA")
+            Blue_Squadron_Mi8:SetLivery("IRRE_AAA_Oppo")
 
             -- Airwings
 
