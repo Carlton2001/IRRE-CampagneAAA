@@ -30,9 +30,9 @@ RAT.ATCswitch = false
     -- Direction des vents (cf ME)
 
     local WIND = {}
-    WIND.High   = 227   -- 26000 ft
-    WIND.Medium = 223   -- 6600 ft
-    WIND.Low    = 221   -- 1600 ft
+    WIND.High   = 210   -- 26000 ft
+    WIND.Medium = 207   -- 6600 ft
+    WIND.Low    = 205   -- 1600 ft
 
 ---------------------------------------------------------------------------------------------------
 -- INITIALISATIONS
