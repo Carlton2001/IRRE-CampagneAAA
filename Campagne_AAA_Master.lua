@@ -9,15 +9,13 @@ RAT.ATCswitch = false
 
     --[[ POINTS D'ATTENTION
 
-        EWR Turquey désactivé
-        GCI/CAP Turquey désactivé
         CAP2 OTAN désactivée
 
     ]]
 
     -- A désactiver en PROD
 
-    local EnvProd = true
+    local EnvProd = false
 
     -- Fréquences Radio - Attention Callsigns & Radios du EWR et des GCI/CAP à paramétrer dans l'EM
 
@@ -115,9 +113,9 @@ RAT.ATCswitch = false
     SAM.Blue.Syria.Aleppo_S300      = GROUP:FindByName("SAM_Blue_Syria_Aleppo_S300"):Activate()
     SAM.Blue.Syria.Palmyra_Hawk     = GROUP:FindByName("SAM_Blue_Syria_Palmyra_Hawk"):Activate()
     SAM.Blue.Syria.Tabqa_S300       = GROUP:FindByName("SAM_Blue_Syria_Tabqa_S300"):Activate()
-    -- SAM.Blue.Turkey.CB22_S300       = GROUP:FindByName("SAM_Blue_Turkey_CB22_S300"):Activate()
-    -- SAM.Blue.Turkey.DB30_S300       = GROUP:FindByName("SAM_Blue_Turkey_DB30_S300"):Activate()
-    -- SAM.Blue.Turkey.IF25_S300       = GROUP:FindByName("SAM_Blue_Turkey_IF25_S300"):Activate()
+    SAM.Blue.Turkey.CB22_S300       = GROUP:FindByName("SAM_Blue_Turkey_CB22_S300"):Activate()
+    SAM.Blue.Turkey.DB30_S300       = GROUP:FindByName("SAM_Blue_Turkey_DB30_S300"):Activate()
+    SAM.Blue.Turkey.IF25_S300       = GROUP:FindByName("SAM_Blue_Turkey_IF25_S300"):Activate()
     SAM.Red.Syria.AlQusayr_Hawk     = GROUP:FindByName("SAM_Red_Syria_AlQusayr_Hawk"):Activate()
     SAM.Red.Syria.Damascus_S300     = GROUP:FindByName("SAM_Red_Syria_Damascus_S300"):Activate()
     SAM.Red.Lebanon.Beirut_Hawk     = GROUP:FindByName("SAM_Red_Lebanon_Beirut_Hawk"):Activate()
@@ -144,10 +142,10 @@ RAT.ATCswitch = false
     AIR.Red     = {}
     AIR.Blue    = {}
 
-    AIR.Red.All             = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterStart()
+    AIR.Red.All             = SET_GROUP:New():FilterCoalitions("red"):FilterCategories({"plane", "helicopter"}):FilterStart()
     AIR.Red.GCICAP          = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterPrefixes{"CAP_Red", "GCI_Red"}:FilterStart()
-    AIR.Red.Players         = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterPrefixes{"Cli_"}:FilterStart()
-    AIR.Blue.All            = SET_GROUP:New():FilterCoalitions("blue"):FilterCategoryAirplane():FilterStart()
+    AIR.Red.Players         = SET_GROUP:New():FilterCoalitions("red"):FilterCategories({"plane", "helicopter"}):FilterPrefixes{"Cli_"}:FilterStart()
+    AIR.Blue.All            = SET_GROUP:New():FilterCoalitions("blue"):FilterCategories({"plane", "helicopter"}):FilterStart()
     AIR.Blue.IsraelOTAN     = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(COUNTRY.IsraelOTAN):FilterCategoryAirplane():FilterStart()
     AIR.Blue.TurkeySyria    = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(COUNTRY.TurkeySyria):FilterCategoryAirplane():FilterStart()
 
@@ -326,7 +324,7 @@ RAT.ATCswitch = false
             -- TANKER ESCORT
             if ESCORT then
                 BASE:E(ESCORT.Name)
-                local MissionEscort = AUFTRAG:NewESCORT(Tanker:GetGroup(), nil, 30)
+                local MissionEscort = AUFTRAG:NewESCORT(Tanker:GetGroup(), nil, 20)
                 local Escort = FLIGHTGROUP:New(ESCORT.Name)
                 Escort:SetDefaultFormation(ENUMS.Formation.FixedWing.FighterVic.Close)
                 Escort:SetDefaultCallsign(ESCORT.Callsign, ESCORT.CallsignNumber)
@@ -562,18 +560,18 @@ RAT.ATCswitch = false
 
         function Auftrag_M01_Red_Tankers ()
 
-            -- Texaco KC130
-            LaunchTanker (
-                "TANKER_Red_KC130", -- GroupName
-                TANKER.KC130, -- TANKERTYPE
-                {["ZoneName"] = "ZONE_Tanker_Red-1", ["Altitude"] = 18000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
-                {["Frequency"] = RadioTanker1, ["Callsign"] = CALLSIGN.Tanker.Texaco}, -- COMMS
-                AIRBASE.Syria.Damascus, -- HomeBase
-                {["Channel"] = 28, ["Morse"] = "TEX", ["Band"] = "Y"}, -- TACAN
-                10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
-                10, -- DepartureTime (s)
-                {["Name"] = "Escort_Red_Tanker1", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 6} -- ESCORT
-            )
+            -- -- Texaco KC130
+            -- LaunchTanker (
+            --     "TANKER_Red_KC130", -- GroupName
+            --     TANKER.KC130, -- TANKERTYPE
+            --     {["ZoneName"] = "ZONE_Tanker_Red-1", ["Altitude"] = 18000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
+            --     {["Frequency"] = RadioTanker1, ["Callsign"] = CALLSIGN.Tanker.Texaco}, -- COMMS
+            --     AIRBASE.Syria.Damascus, -- HomeBase
+            --     {["Channel"] = 28, ["Morse"] = "TEX", ["Band"] = "Y"}, -- TACAN
+            --     10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
+            --     10, -- DepartureTime (s)
+            --     {["Name"] = "Escort_Red_Tanker1", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 6} -- ESCORT
+            -- )
 
             -- Arco IL78
             LaunchTanker (
@@ -601,18 +599,18 @@ RAT.ATCswitch = false
                 {["Name"] = "Escort_Red_Tanker2", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 8} -- ESCORT
             )
 
-            -- Texaco KC135MPRS
-            LaunchTanker (
-                "TANKER_Red_KC135MPRS", -- GroupName
-                TANKER.KC135MPRS, -- TANKERTYPE
-                {["ZoneName"] = "ZONE_Tanker_Red-2", ["Altitude"] = 20000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
-                {["Frequency"] = RadioTanker4, ["Callsign"] = CALLSIGN.Tanker.Texaco}, -- COMMS
-                AIRBASE.Syria.Damascus, -- HomeBase
-                {["Channel"] = 39, ["Morse"] = "TEX", ["Band"] = "Y"}, -- TACAN
-                10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
-                10, -- DepartureTime (s)
-                {["Name"] = "Escort_Red_Tanker2", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 9} -- ESCORT
-            )
+            -- -- Texaco KC135MPRS
+            -- LaunchTanker (
+            --     "TANKER_Red_KC135MPRS", -- GroupName
+            --     TANKER.KC135MPRS, -- TANKERTYPE
+            --     {["ZoneName"] = "ZONE_Tanker_Red-2", ["Altitude"] = 20000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
+            --     {["Frequency"] = RadioTanker4, ["Callsign"] = CALLSIGN.Tanker.Texaco}, -- COMMS
+            --     AIRBASE.Syria.Damascus, -- HomeBase
+            --     {["Channel"] = 39, ["Morse"] = "TEX", ["Band"] = "Y"}, -- TACAN
+            --     10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
+            --     10, -- DepartureTime (s)
+            --     {["Name"] = "Escort_Red_Tanker2", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 9} -- ESCORT
+            -- )
 
         end
 
@@ -649,8 +647,8 @@ RAT.ATCswitch = false
             function bomber:OnAfterPassingWaypoint (From, Event, To, Waypoint)
                 if Waypoint.uid == 2 then
                     -- Orbit Start
-                    MessageToAll("SU-24 : ON STATION RAYAK", 5)
-                    FunRadio:NewGenericTransmission("Guns_1.ogg", RadioGeneral):Broadcast()
+                    if EnvProd == false then MessageToAll("SU-24 : ON STATION RAYAK", 5) end
+                    FunRadio:NewGenericTransmission("MISS1-TempeteOrbiteWP1.ogg", RadioGeneral):Broadcast()
                     MenuCommandStartMissionBombing = MENU_COALITION_COMMAND:New(coalition.side.RED, "Démarrage Mission Su-24", nil, function ()
                         MenuCommandStartMissionBombing:Remove()
                         auftragOrbit:Cancel()
@@ -659,13 +657,15 @@ RAT.ATCswitch = false
                     bomber:SwitchFormation(ENUMS.Formation.FixedWing.Trail.Close)
                 elseif Waypoint.uid == 5 then
                     -- IP
-                    MessageToAll("SU-24 : IP", 5)
-                    FunRadio:NewGenericTransmission("Guns_1.ogg", RadioGeneral):Broadcast()
+                    if EnvProd == false then MessageToAll("SU-24 : IP", 5) end
+                    FunRadio:NewGenericTransmission("MISS1-TempeteAvantLargage.ogg", RadioGeneral):Broadcast()
                 end
             end
 
             -- EVENT AFTER ORBIT
             function auftragOrbit:OnAfterDone (From, Event, To)
+                if EnvProd == false then MessageToAll("SU-24 : QUIT ORBIT", 5) end
+                FunRadio:NewGenericTransmission("MISS1-TempetePartduWP1.ogg", RadioGeneral):Broadcast()
                 for _,opsgroup in pairs(auftragBombing:GetOpsGroups()) do
                     local flightgroup = opsgroup
                     flightgroup:AddWaypoint(ZONE:New("M01_Zone_WPT2"):GetCoordinate(), nil, nil, 7000)
@@ -678,10 +678,10 @@ RAT.ATCswitch = false
                 for _,opsgroup in pairs(auftragBombing:GetOpsGroups()) do
                     local flightgroup = opsgroup
                     if flightgroup:IsAlive() then
-                        MessageToAll("SU-24 : BOMBING DONE", 5)
+                        if EnvProd == false then MessageToAll("SU-24 : BOMBING DONE", 5) end
                         BASE:ScheduleOnce(30,
                             function ()
-                                MessageToAll("SU-24 : RTB", 5)
+                                if EnvProd == false then MessageToAll("SU-24 : RTB", 5) end
                             end
                         )
                         flightgroup:SwitchFormation(ENUMS.Formation.FixedWing.FighterVic.Close)
@@ -823,17 +823,17 @@ RAT.ATCswitch = false
 
             SchedulerSmoke_Status = false
             function RepeatSmoke ()
-                if AIR.Red.All:AnyInZone(ZoneFumi) and SchedulerSmoke_Status == false then
+                if AIR.Red.Players:AnyInZone(ZoneFumi) and SchedulerSmoke_Status == false then
                     SchedulerSmoke_Status = true
                     SchedulerSmoke = SCHEDULER:New(nil,
                         function()
-                            MessageToAll("RED CONVOIS : Start / Repeat Smoke", 5)
+                            if EnvProd == false then MessageToAll("RED CONVOIS : Start / Repeat Smoke", 5) end
                             TargetA:GetCoordinate():SmokeGreen()
                             TargetB:GetCoordinate():SmokeGreen()
                         end, {}, 1, 300
                     )
-                elseif AIR.Red.All:NoneInZone(ZoneFumi) and SchedulerSmoke_Status == true then
-                    MessageToAll("RED CONVOIS : Stopping Smoke", 5)
+                elseif AIR.Red.Players:NoneInZone(ZoneFumi) and SchedulerSmoke_Status == true then
+                    if EnvProd == false then MessageToAll("RED CONVOIS : Stopping Smoke", 5) end
                     SchedulerSmoke_Status = false
                     SchedulerSmoke:Stop()
                     SchedulerStartSmoke:Start()
@@ -848,8 +848,7 @@ RAT.ATCswitch = false
 
         -- Configuration Generale
 
-            -- CAPGCI_TURKEY()
-
+            CAPGCI_TURKEY()
             CAPGCI_OTAN()
             CAPGCI_ISRAEL()
             CAPGCI_SYRIA()
@@ -868,7 +867,8 @@ RAT.ATCswitch = false
             SchedulerWPT1 = SCHEDULER:New(nil,
                 function()
                     if AIR.Red.Players:AnyInZone(ZoneWPT1) then
-                        MessageToAll("DECLENCHEMENT Convois / Blue CAS / Su-24", 5)
+                        if EnvProd == false then MessageToAll("DECLENCHEMENT Convois / Blue CAS / Su-24", 5) end
+                        FunRadio:NewGenericTransmission("MISS1-DragonMessage1.ogg", RadioGeneral):Broadcast()
                         Management_M01_Convois() -- Démarrage des convois Rouges et gestîon des fumis/radios
                         Auftrag_M01_Blue_CAS() -- Lancement de la CAS Rouge sur nos Convois
                         Auftrag_M01_Red_AttackConvoi() -- Lancement des Su-24 sur les Camions Bleus qui pillent le train
