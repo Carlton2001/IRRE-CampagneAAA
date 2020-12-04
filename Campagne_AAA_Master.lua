@@ -384,6 +384,7 @@ RAT.ATCswitch = false
             local DetectionOTAN = DETECTION_AREAS:New(EWR.OTAN, 150000)
             local A2ADispatcherOTAN = AI_A2A_DISPATCHER:New(DetectionOTAN)
             A2ADispatcherOTAN:SetBorderZone({BORDER.Blue.OTAN})
+            A2ADispatcherOTAN:SetDisengageRadius(130000)
             A2ADispatcherOTAN:SetDefaultFuelThreshold(0.4)
             A2ADispatcherOTAN:SetDefaultGrouping(2)
             A2ADispatcherOTAN:SetDefaultOverhead(2)
@@ -416,6 +417,7 @@ RAT.ATCswitch = false
             local DetectionIsrael = DETECTION_AREAS:New(EWR.Israel, 150000)
             local A2ADispatcherIsrael = AI_A2A_DISPATCHER:New(DetectionIsrael)
             A2ADispatcherIsrael:SetBorderZone({BORDER.Blue.Israel})
+            A2ADispatcherIsrael:SetDisengageRadius(90000)
             A2ADispatcherIsrael:SetDefaultFuelThreshold(0.4)
             A2ADispatcherIsrael:SetDefaultGrouping(2)
             A2ADispatcherIsrael:SetDefaultOverhead(2)
@@ -476,6 +478,7 @@ RAT.ATCswitch = false
             local DetectionSyria = DETECTION_AREAS:New(EWR.Syria, 150000)
             local A2ADispatcherSyria = AI_A2A_DISPATCHER:New(DetectionSyria)
             A2ADispatcherSyria:SetBorderZone({BORDER.Blue.Syria})
+            A2ADispatcherSyria:SetDisengageRadius(90000)
             A2ADispatcherSyria:SetDefaultFuelThreshold(0.4)
             A2ADispatcherSyria:SetDefaultGrouping(2)
             A2ADispatcherSyria:SetDefaultOverhead(1)
@@ -513,9 +516,10 @@ RAT.ATCswitch = false
             local DetectionRed = DETECTION_AREAS:New(EWR.Red, 150000)
             local A2ADispatcherRed = AI_A2A_DISPATCHER:New(DetectionRed)
             A2ADispatcherRed:SetBorderZone({BORDER.Red})
+            A2ADispatcherRed:SetDisengageRadius(125000)
             A2ADispatcherRed:SetDefaultFuelThreshold(0.4)
             A2ADispatcherRed:SetDefaultGrouping(2)
-            A2ADispatcherRed:SetDefaultOverhead(2)
+            A2ADispatcherRed:SetDefaultOverhead(1)
             A2ADispatcherRed:SetDefaultLandingAtRunway()
             A2ADispatcherRed:SetTacticalDisplay(TacticalDisplay)
             -- CAP
@@ -876,4 +880,3 @@ RAT.ATCswitch = false
                     end
                 end, {}, 1, 10
             )
-
