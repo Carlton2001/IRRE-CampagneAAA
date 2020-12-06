@@ -20,10 +20,10 @@ RAT.ATCswitch = false
     -- Fréquences Radio - Attention Callsigns & Radios du EWR et des GCI/CAP à paramétrer dans l'EM
 
     local RadioGeneral = 305.00
-    local RadioTanker1 = 283.00 -- Texaco (KC130)
-    local RadioTanker2 = 289.00 -- Arco (IL78)
-    local RadioTanker3 = 272.00 -- Shell (KC135)
-    local RadioTanker4 = 269.00 -- Texaco2 (KC135MPRS)
+    local RadioTanker1 = 132.00 -- Texaco (KC130)
+    local RadioTanker2 = 138.50 -- Arco (IL78)
+    local RadioTanker3 = 134.50 -- Shell (KC135)
+    local RadioTanker4 = 136.00 -- Texaco2 (KC135MPRS)
 
     -- Direction des vents (cf ME)
 
@@ -324,10 +324,11 @@ RAT.ATCswitch = false
             -- TANKER ESCORT
             if ESCORT then
                 BASE:E(ESCORT.Name)
-                local MissionEscort = AUFTRAG:NewESCORT(Tanker:GetGroup(), nil, 20)
+                local MissionEscort = AUFTRAG:NewESCORT(Tanker:GetGroup(), {x=-100, y=100, z=200}, 20)
                 local Escort = FLIGHTGROUP:New(ESCORT.Name)
                 Escort:SetDefaultFormation(ENUMS.Formation.FixedWing.FighterVic.Close)
                 Escort:SetDefaultCallsign(ESCORT.Callsign, ESCORT.CallsignNumber)
+                Escort:SwitchRadio(RadioGeneral, radio.modulation.AM)
                 Escort:SetFuelLowThreshold(40)
                 Escort:SetFuelLowRefuel(true)
                 Escort:AddMission(MissionEscort)
@@ -867,7 +868,6 @@ RAT.ATCswitch = false
             Auftrag_M01_Red_Tankers() -- Lancement des Tankers Rouges
 
             -- Players arrivent sur WP1
-
             SchedulerWPT1 = SCHEDULER:New(nil,
                 function()
                     if AIR.Red.Players:AnyInZone(ZoneWPT1) then
