@@ -575,7 +575,7 @@ RAT.ATCswitch = false
             --     {["Channel"] = 28, ["Morse"] = "TEX", ["Band"] = "Y"}, -- TACAN
             --     10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
             --     10, -- DepartureTime (s)
-            --     {["Name"] = "Escort_Red_Tanker1", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 6} -- ESCORT
+            --     {["Name"] = "Escort_Red_Tanker1", ["Callsign"] = CALLSIGN.Aircraft.Springfield, ["CallsignNumber"] = 1} -- ESCORT
             -- )
 
             -- Arco IL78
@@ -588,7 +588,7 @@ RAT.ATCswitch = false
                 {["Channel"] = 25, ["Morse"] = "ARC", ["Band"] = "Y"}, -- TACAN
                 10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
                 10, -- DepartureTime (s)
-                {["Name"] = "Escort_Red_Tanker1", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 7} -- ESCORT
+                {["Name"] = "Escort_Red_Tanker2", ["Callsign"] = CALLSIGN.Aircraft.Springfield, ["CallsignNumber"] = 2} -- ESCORT
             )
 
             -- Shell KC135
@@ -601,7 +601,7 @@ RAT.ATCswitch = false
                 {["Channel"] = 34, ["Morse"] = "SHL", ["Band"] = "Y"}, -- TACAN
                 10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
                 10, -- DepartureTime (s)
-                {["Name"] = "Escort_Red_Tanker2", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 8} -- ESCORT
+                {["Name"] = "Escort_Red_Tanker3", ["Callsign"] = CALLSIGN.Aircraft.Springfield, ["CallsignNumber"] = 3} -- ESCORT
             )
 
             -- -- Texaco KC135MPRS
@@ -614,7 +614,7 @@ RAT.ATCswitch = false
             --     {["Channel"] = 39, ["Morse"] = "TEX", ["Band"] = "Y"}, -- TACAN
             --     10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
             --     10, -- DepartureTime (s)
-            --     {["Name"] = "Escort_Red_Tanker2", ["Callsign"] = CALLSIGN.Aircraft.Pontiac, ["CallsignNumber"] = 9} -- ESCORT
+            --     {["Name"] = "Escort_Red_Tanker4", ["Callsign"] = CALLSIGN.Aircraft.Springfield, ["CallsignNumber"] = 4} -- ESCORT
             -- )
 
         end
