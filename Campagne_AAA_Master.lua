@@ -684,9 +684,10 @@ RAT.ATCswitch = false
                     local flightgroup = opsgroup
                     if flightgroup:IsAlive() then
                         if EnvProd == false then MessageToAll("SU-24 : BOMBING DONE", 5) end
-                        BASE:ScheduleOnce(30,
+                        BASE:ScheduleOnce(20,
                             function ()
                                 if EnvProd == false then MessageToAll("SU-24 : RTB", 5) end
+                                FunRadio:NewGenericTransmission("MISS1-TempeteOnrentre.ogg", RadioGeneral):Broadcast()
                             end
                         )
                         flightgroup:SwitchFormation(ENUMS.Formation.FixedWing.FighterVic.Close)
