@@ -868,14 +868,21 @@ RAT.ATCswitch = false
             -- Démarrage serveur
             Auftrag_M01_Red_Tankers() -- Lancement des Tankers Rouges
 
+            -- Lancement de la CAS Rouge sur nos Convois
+            BASE:ScheduleOnce(900,
+                function ()
+                    if EnvProd == false then MessageToAll("DECLENCHEMENT Blue CAS", 5) end
+                    Auftrag_M01_Blue_CAS()
+                end
+            )
+
             -- Players arrivent sur WP1
             SchedulerWPT1 = SCHEDULER:New(nil,
                 function()
                     if AIR.Red.Players:AnyInZone(ZoneWPT1) then
-                        if EnvProd == false then MessageToAll("DECLENCHEMENT Convois / Blue CAS / Su-24", 5) end
+                        if EnvProd == false then MessageToAll("DECLENCHEMENT Convois / Su-24", 5) end
                         FunRadio:NewGenericTransmission("MISS1-DragonMessage1.ogg", RadioGeneral):Broadcast()
                         Management_M01_Convois() -- Démarrage des convois Rouges et gestîon des fumis/radios
-                        Auftrag_M01_Blue_CAS() -- Lancement de la CAS Rouge sur nos Convois
                         Auftrag_M01_Red_AttackConvoi() -- Lancement des Su-24 sur les Camions Bleus qui pillent le train
                         SchedulerWPT1:Stop()
                     end
