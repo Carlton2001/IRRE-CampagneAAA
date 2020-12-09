@@ -10,6 +10,7 @@ RAT.ATCswitch = false
     --[[ POINTS D'ATTENTION
 
         CAP2 OTAN désactivée
+        CAPE TURQUEY désactivée
 
     ]]
 
@@ -284,26 +285,6 @@ RAT.ATCswitch = false
     end
 
 ---------------------------------------------------------------------------------------------------
--- PLUMES & FIRES
----------------------------------------------------------------------------------------------------
-
-    local ZonesDestruction = SET_ZONE:New():FilterPrefixes("Zone_Destroy"):FilterStart():FilterStop():ForEachZone(
-        function (zone)
-            -- Smoke + Fire : 1,2,3,4 - Smoke : 5,6,7,8
-            local coords = zone:GetCoordinate()
-            if      string.match(zone.ZoneName, "SmallFireSmoke")   then coords:BigSmokeAndFire(1, 0.5)
-            elseif  string.match(zone.ZoneName, "MediumFireSmoke")  then coords:BigSmokeAndFire(2, 0.5)
-            elseif  string.match(zone.ZoneName, "LargeFireSmoke")   then coords:BigSmokeAndFire(3, 0.5)
-            elseif  string.match(zone.ZoneName, "HugeFireSmoke")    then coords:BigSmokeAndFire(4, 0.5)
-            elseif  string.match(zone.ZoneName, "SmallSmoke")       then coords:BigSmokeAndFire(5, 0.5)
-            elseif  string.match(zone.ZoneName, "MediumSmoke")      then coords:BigSmokeAndFire(6, 0.5)
-            elseif  string.match(zone.ZoneName, "LargeSmoke")       then coords:BigSmokeAndFire(7, 0.5)
-            elseif  string.match(zone.ZoneName, "HugeSmoke")        then coords:BigSmokeAndFire(8, 0.5)
-            end
-        end
-    )
-
----------------------------------------------------------------------------------------------------
 -- TANKER FUNCTIONS
 ---------------------------------------------------------------------------------------------------
 
@@ -389,23 +370,20 @@ RAT.ATCswitch = false
             A2ADispatcherOTAN:SetDefaultFuelThreshold(0.4)
             A2ADispatcherOTAN:SetDefaultGrouping(2)
             A2ADispatcherOTAN:SetDefaultOverhead(2)
-            A2ADispatcherOTAN:SetDefaultLandingAtRunway()
+            A2ADispatcherOTAN:SetDefaultTakeoffInAir()
             A2ADispatcherOTAN:SetTacticalDisplay(TacticalDisplay)
             -- CAP 1
             A2ADispatcherOTAN:SetSquadron("OTAN CAP1", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"CAP_Blue_OTAN"}, 4)
-            A2ADispatcherOTAN:SetSquadronTakeoffFromParkingHot("OTAN CAP1")
             A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP1", 1000, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 800, 4000, 8000, "RADIO")
             A2ADispatcherOTAN:SetSquadronCapInterval("OTAN CAP1", 1, 60, 120, 1)
             A2ADispatcherOTAN:SetSquadronGrouping("OTAN CAP1", 2)
             -- CAP 2
             -- A2ADispatcherOTAN:SetSquadron("OTAN CAP2", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"CAP_Blue_OTAN"}, 4)
-            -- A2ADispatcherOTAN:SetSquadronTakeoffFromParkingHot("OTAN CAP2")
             -- A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP2", 1000, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 800, 4000, 8000, "RADIO")
             -- A2ADispatcherOTAN:SetSquadronCapInterval("OTAN CAP2", 1, 60, 120, 1)
             -- A2ADispatcherOTAN:SetSquadronGrouping("OTAN CAP2", 2)
             -- GCI
             A2ADispatcherOTAN:SetSquadron("OTAN GCI", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"GCI_Blue_OTAN"}, 2)
-            A2ADispatcherOTAN:SetSquadronTakeoffFromParkingHot("OTAN GCI")
             A2ADispatcherOTAN:SetSquadronGrouping("OTAN GCI", 2)
             A2ADispatcherOTAN:SetSquadronGci("OTAN GCI", 1000, 2000)
         end
@@ -422,17 +400,16 @@ RAT.ATCswitch = false
             A2ADispatcherIsrael:SetDefaultFuelThreshold(0.4)
             A2ADispatcherIsrael:SetDefaultGrouping(2)
             A2ADispatcherIsrael:SetDefaultOverhead(2)
+            A2ADispatcherIsrael:SetDefaultTakeoffInAir()
             A2ADispatcherIsrael:SetDefaultLandingAtRunway()
             A2ADispatcherIsrael:SetTacticalDisplay(TacticalDisplay)
             -- CAP
             A2ADispatcherIsrael:SetSquadron("Israel CAP", AIRBASE.Syria.Ramat_David, {"CAP_Blue_Israel"}, 4)
-            A2ADispatcherIsrael:SetSquadronTakeoffFromRunway("Israel CAP")
             A2ADispatcherIsrael:SetSquadronCap2("Israel CAP", 1000, 2000, 2000, 10000, "BARO", ZoneCAPIsrael, 600, 800, 4000, 8000, "RADIO")
             A2ADispatcherIsrael:SetSquadronCapInterval("Israel CAP", 1, 60, 120, 1)
             A2ADispatcherIsrael:SetSquadronGrouping("Israel CAP", 2)
             -- GCI
             A2ADispatcherIsrael:SetSquadron("Israel GCI", AIRBASE.Syria.Ramat_David, {"GCI_Blue_Israel"}, 2)
-            A2ADispatcherIsrael:SetSquadronTakeoffFromRunway("Israel GCI")
             A2ADispatcherIsrael:SetSquadronGrouping("Israel GCI", 2)
             A2ADispatcherIsrael:SetSquadronGci("Israel GCI", 1000, 2000)
         end
@@ -450,22 +427,20 @@ RAT.ATCswitch = false
             A2ADispatcherTurkey:SetDefaultGrouping(2)
             A2ADispatcherTurkey:SetDefaultOverhead(2)
             A2ADispatcherTurkey:SetDefaultLandingAtRunway()
+            A2ADispatcherTurkey:SetDefaultTakeoffInAir()
             A2ADispatcherTurkey:SetTacticalDisplay(TacticalDisplay)
             -- CAP West
             A2ADispatcherTurkey:SetSquadron("Turkey CAPW", AIRBASE.Syria.Incirlik, {"CAP_Blue_Turkey"}, 4)
-            A2ADispatcherTurkey:SetSquadronTakeoffFromRunway("Turkey CAPW")
             A2ADispatcherTurkey:SetSquadronCap2("Turkey CAPW", 1000, 2000, 2000, 10000, "BARO", ZoneCAPTurkeyW, 600, 800, 4000, 8000, "RADIO")
             A2ADispatcherTurkey:SetSquadronCapInterval("Turkey CAPW", 1, 60, 120, 1)
             A2ADispatcherTurkey:SetSquadronGrouping("Turkey CAPW", 2)
-            -- CAP East
-            A2ADispatcherTurkey:SetSquadron("Turkey CAPE", AIRBASE.Syria.Incirlik, {"CAP_Blue_Turkey"}, 4)
-            A2ADispatcherTurkey:SetSquadronTakeoffFromRunway("Turkey CAPE")
-            A2ADispatcherTurkey:SetSquadronCap2("Turkey CAPE", 1000, 2000, 2000, 10000, "BARO", ZoneCAPTurkeyE, 600, 800, 4000, 8000, "RADIO")
-            A2ADispatcherTurkey:SetSquadronCapInterval("Turkey CAPE", 1, 60, 120, 1)
-            A2ADispatcherTurkey:SetSquadronGrouping("Turkey CAPE", 2)
+            -- -- CAP East
+            -- A2ADispatcherTurkey:SetSquadron("Turkey CAPE", AIRBASE.Syria.Incirlik, {"CAP_Blue_Turkey"}, 4)
+            -- A2ADispatcherTurkey:SetSquadronCap2("Turkey CAPE", 1000, 2000, 2000, 10000, "BARO", ZoneCAPTurkeyE, 600, 800, 4000, 8000, "RADIO")
+            -- A2ADispatcherTurkey:SetSquadronCapInterval("Turkey CAPE", 1, 60, 120, 1)
+            -- A2ADispatcherTurkey:SetSquadronGrouping("Turkey CAPE", 2)
             -- GCI
             A2ADispatcherTurkey:SetSquadron("Turkey GCI", AIRBASE.Syria.Incirlik, {"GCI_Blue_Turkey"}, 2)
-            A2ADispatcherTurkey:SetSquadronTakeoffFromRunway("Turkey GCI")
             A2ADispatcherTurkey:SetSquadronGrouping("Turkey GCI", 2)
             A2ADispatcherTurkey:SetSquadronGci("Turkey GCI", 1000, 2000)
         end
@@ -483,28 +458,25 @@ RAT.ATCswitch = false
             A2ADispatcherSyria:SetDefaultFuelThreshold(0.4)
             A2ADispatcherSyria:SetDefaultGrouping(2)
             A2ADispatcherSyria:SetDefaultOverhead(1)
+            A2ADispatcherSyria:SetDefaultTakeoffInAir()
             A2ADispatcherSyria:SetDefaultLandingAtRunway()
             A2ADispatcherSyria:SetTacticalDisplay(TacticalDisplay)
             -- CAP West
             A2ADispatcherSyria:SetSquadron("Syria CAPW", AIRBASE.Syria.Hama, {"CAP_Blue_Syria"}, 4)
-            A2ADispatcherSyria:SetSquadronTakeoffFromRunway("Syria CAPW")
             A2ADispatcherSyria:SetSquadronCap2("Syria CAPW", 1000, 2000, 2000, 10000, "BARO", ZoneCAPSyriaW, 600, 800, 4000, 8000, "RADIO")
             A2ADispatcherSyria:SetSquadronCapInterval("Syria CAPW", 1, 60, 120, 1)
             A2ADispatcherSyria:SetSquadronGrouping("Syria CAPW", 2)
             -- CAP East
             A2ADispatcherSyria:SetSquadron("Syria CAPE", AIRBASE.Syria.Palmyra, {"CAP_Blue_Syria"}, 4)
-            A2ADispatcherSyria:SetSquadronTakeoffFromRunway("Syria CAPE")
             A2ADispatcherSyria:SetSquadronCap2("Syria CAPE", 1000, 2000, 2000, 10000, "BARO", ZoneCAPSyriaE, 600, 800, 4000, 8000, "RADIO")
             A2ADispatcherSyria:SetSquadronCapInterval("Syria CAPE", 1, 60, 120, 1)
             A2ADispatcherSyria:SetSquadronGrouping("Syria CAPE", 2)
             -- GCI West
             A2ADispatcherSyria:SetSquadron("Syria GCIW", AIRBASE.Syria.Abu_al_Duhur, {"GCI_Blue_Syria"}, 2)
-            A2ADispatcherSyria:SetSquadronTakeoffFromRunway("Syria GCIW")
             A2ADispatcherSyria:SetSquadronGrouping("Syria GCIW", 2)
             A2ADispatcherSyria:SetSquadronGci("Syria GCIW", 1000, 2000)
             -- GCI Est
             A2ADispatcherSyria:SetSquadron("Syria GCIE", AIRBASE.Syria.Tabqa, {"GCI_Blue_Syria"}, 2)
-            A2ADispatcherSyria:SetSquadronTakeoffFromRunway("Syria GCIE")
             A2ADispatcherSyria:SetSquadronGrouping("Syria GCIE", 2)
             A2ADispatcherSyria:SetSquadronGci("Syria GCIE", 1000, 2000)
         end
@@ -521,22 +493,20 @@ RAT.ATCswitch = false
             A2ADispatcherRed:SetDefaultFuelThreshold(0.4)
             A2ADispatcherRed:SetDefaultGrouping(2)
             A2ADispatcherRed:SetDefaultOverhead(1)
+            A2ADispatcherRed:SetDefaultTakeoffInAir()
             A2ADispatcherRed:SetDefaultLandingAtRunway()
             A2ADispatcherRed:SetTacticalDisplay(TacticalDisplay)
             -- CAP
             A2ADispatcherRed:SetSquadron("Red CAP", AIRBASE.Syria.An_Nasiriyah, {"CAP_Red"}, 4)
-            A2ADispatcherRed:SetSquadronTakeoffFromRunway("Red CAP")
             A2ADispatcherRed:SetSquadronCap2("Red CAP", 1000, 2000, 2000, 10000, "BARO", ZoneCAPRed, 600, 800, 4000, 8000, "RADIO")
             A2ADispatcherRed:SetSquadronCapInterval("Red CAP", 1, 60, 120, 1)
             A2ADispatcherRed:SetSquadronGrouping("Red CAP", 2)
             -- GCI Nord
             A2ADispatcherRed:SetSquadron("Red GCIN", AIRBASE.Syria.An_Nasiriyah, {"GCI_Red"}, 2)
-            A2ADispatcherRed:SetSquadronTakeoffFromRunway("Red GCIN")
             A2ADispatcherRed:SetSquadronGrouping("Red GCIN", 2)
             A2ADispatcherRed:SetSquadronGci("Red GCIN", 1000, 2000)
             -- GCI Sud
             A2ADispatcherRed:SetSquadron("Red GCIS", AIRBASE.Syria.Mezzeh, {"GCI_Red"}, 2)
-            A2ADispatcherRed:SetSquadronTakeoffFromRunway("Red GCIS")
             A2ADispatcherRed:SetSquadronGrouping("Red GCIS", 2)
             A2ADispatcherRed:SetSquadronGci("Red GCIS", 1000, 2000)
         end
