@@ -114,11 +114,14 @@ RAT.ATCswitch = false
     SAM.Blue.Syria.Aleppo_S300      = GROUP:FindByName("SAM_Blue_Syria_Aleppo_S300"):Activate()
     SAM.Blue.Syria.Palmyra_Hawk     = GROUP:FindByName("SAM_Blue_Syria_Palmyra_Hawk"):Activate()
     SAM.Blue.Syria.Tabqa_S300       = GROUP:FindByName("SAM_Blue_Syria_Tabqa_S300"):Activate()
+    SAM.Blue.Syria.Hama_SA15        = GROUP:FindByName("SAM_Blue_Syria_Hama_SA15"):Activate()
     SAM.Blue.Turkey.CB22_S300       = GROUP:FindByName("SAM_Blue_Turkey_CB22_S300"):Activate()
     SAM.Blue.Turkey.DB30_S300       = GROUP:FindByName("SAM_Blue_Turkey_DB30_S300"):Activate()
     SAM.Blue.Turkey.IF25_S300       = GROUP:FindByName("SAM_Blue_Turkey_IF25_S300"):Activate()
     SAM.Red.Syria.AlQusayr_Hawk     = GROUP:FindByName("SAM_Red_Syria_AlQusayr_Hawk"):Activate()
     SAM.Red.Syria.Damascus_S300     = GROUP:FindByName("SAM_Red_Syria_Damascus_S300"):Activate()
+    SAM.Red.Syria.AnNasiriyah_SA15  = GROUP:FindByName("SAM_Red_Syria_AnNasiriyah_SA15"):Activate()
+    SAM.Red.Syria.Mezzeh_SA15       = GROUP:FindByName("SAM_Red_Syria_Mezzeh_SA15"):Activate()
     SAM.Red.Lebanon.Beirut_Hawk     = GROUP:FindByName("SAM_Red_Lebanon_Beirut_Hawk"):Activate()
 
     -- SAM Zones
@@ -362,27 +365,28 @@ RAT.ATCswitch = false
             AwacsOTAN:SetTakeoffHot()
             AwacsOTAN:Start()
             -- CAP/GCI OTAN
-            local ZoneCAPOTAN = ZONE_POLYGON:New("WPT_CAP_OTAN", GROUP:FindByName("WPT_CAP_OTAN"))
+            local ZoneCAPOTAN = ZONE:New("ZONE_CAP_OTAN")
             local DetectionOTAN = DETECTION_AREAS:New(EWR.OTAN, 150000)
             local A2ADispatcherOTAN = AI_A2A_DISPATCHER:New(DetectionOTAN)
             A2ADispatcherOTAN:SetBorderZone({BORDER.Blue.OTAN})
             A2ADispatcherOTAN:SetDisengageRadius(130000)
             A2ADispatcherOTAN:SetDefaultGrouping(2)
             A2ADispatcherOTAN:SetDefaultOverhead(2)
-            A2ADispatcherOTAN:SetDefaultTakeoffInAir()
+            A2ADispatcherOTAN:SetDefaultTakeoffFromParkingHot()
             A2ADispatcherOTAN:SetTacticalDisplay(TacticalDisplay)
             -- CAP 1
             A2ADispatcherOTAN:SetSquadron("OTAN CAP1", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"CAP_Blue_OTAN"}, 4)
-            A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP1", 1000, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 800, 4000, 8000, "RADIO")
+            A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP1", 1000, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 600, 8000, 8000, "BARO")
+            A2ADispatcherOTAN:SetSquadronCapRacetrack("OTAN CAP1", 40000, 40000, 30, 30, 40*60, 40*60)
             A2ADispatcherOTAN:SetSquadronCapInterval("OTAN CAP1", 1, 60, 120, 1)
             A2ADispatcherOTAN:SetSquadronGrouping("OTAN CAP1", 2)
             -- CAP 2
             -- A2ADispatcherOTAN:SetSquadron("OTAN CAP2", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"CAP_Blue_OTAN"}, 4)
-            -- A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP2", 1000, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 800, 4000, 8000, "RADIO")
+            -- A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP2", 1000, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 650, 8000, 9000, "BARO")
             -- A2ADispatcherOTAN:SetSquadronCapInterval("OTAN CAP2", 1, 60, 120, 1)
             -- A2ADispatcherOTAN:SetSquadronGrouping("OTAN CAP2", 2)
             -- GCI
-            A2ADispatcherOTAN:SetSquadron("OTAN GCI", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"GCI_Blue_OTAN"}, 2)
+            A2ADispatcherOTAN:SetSquadron("OTAN GCI", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"GCI_Blue_OTAN"}, 4)
             A2ADispatcherOTAN:SetSquadronGrouping("OTAN GCI", 2)
             A2ADispatcherOTAN:SetSquadronGci("OTAN GCI", 1000, 2000)
         end
@@ -391,7 +395,7 @@ RAT.ATCswitch = false
 
         function CAPGCI_ISRAEL ()
             -- CAP/GCI Israel
-            local ZoneCAPIsrael = ZONE_POLYGON:New("WPT_CAP_Israel", GROUP:FindByName("WPT_CAP_Israel"))
+            local ZoneCAPIsrael = ZONE:New("ZONE_CAP_Israel")
             local DetectionIsrael = DETECTION_AREAS:New(EWR.Israel, 150000)
             local A2ADispatcherIsrael = AI_A2A_DISPATCHER:New(DetectionIsrael)
             A2ADispatcherIsrael:SetBorderZone({BORDER.Blue.Israel})
@@ -403,11 +407,12 @@ RAT.ATCswitch = false
             A2ADispatcherIsrael:SetTacticalDisplay(TacticalDisplay)
             -- CAP
             A2ADispatcherIsrael:SetSquadron("Israel CAP", AIRBASE.Syria.Ramat_David, {"CAP_Blue_Israel"}, 4)
-            A2ADispatcherIsrael:SetSquadronCap2("Israel CAP", 1000, 2000, 2000, 10000, "BARO", ZoneCAPIsrael, 600, 800, 4000, 8000, "RADIO")
+            A2ADispatcherIsrael:SetSquadronCap2("Israel CAP", 1000, 2000, 2000, 10000, "BARO", ZoneCAPIsrael, 600, 600, 8000, 8000, "BARO")
+            A2ADispatcherIsrael:SetSquadronCapRacetrack("Israel CAP", 40000, 40000, 60, 60, 40*60, 40*60)
             A2ADispatcherIsrael:SetSquadronCapInterval("Israel CAP", 1, 60, 120, 1)
             A2ADispatcherIsrael:SetSquadronGrouping("Israel CAP", 2)
             -- GCI
-            A2ADispatcherIsrael:SetSquadron("Israel GCI", AIRBASE.Syria.Ramat_David, {"GCI_Blue_Israel"}, 2)
+            A2ADispatcherIsrael:SetSquadron("Israel GCI", AIRBASE.Syria.Ramat_David, {"GCI_Blue_Israel"}, 4)
             A2ADispatcherIsrael:SetSquadronGrouping("Israel GCI", 2)
             A2ADispatcherIsrael:SetSquadronGci("Israel GCI", 1000, 2000)
         end
@@ -416,8 +421,8 @@ RAT.ATCswitch = false
 
         function CAPGCI_TURKEY ()
             -- CAP/GCI Turkey
-            local ZoneCAPTurkeyW = ZONE_POLYGON:New("WPT_CAP_TurkeyW", GROUP:FindByName("WPT_CAP_TurkeyW"))
-            local ZoneCAPTurkeyE = ZONE_POLYGON:New("WPT_CAP_TurkeyE", GROUP:FindByName("WPT_CAP_TurkeyE"))
+            local ZoneCAPTurkeyW = ZONE:New("ZONE_CAP_TurkeyW")
+            local ZoneCAPTurkeyE = ZONE:New("ZONE_CAP_TurkeyE")
             local DetectionTurkey = DETECTION_AREAS:New(EWR.Turkey, 150000)
             local A2ADispatcherTurkey = AI_A2A_DISPATCHER:New(DetectionTurkey)
             A2ADispatcherTurkey:SetBorderZone({BORDER.Blue.Turkey})
@@ -428,16 +433,18 @@ RAT.ATCswitch = false
             A2ADispatcherTurkey:SetTacticalDisplay(TacticalDisplay)
             -- CAP West
             A2ADispatcherTurkey:SetSquadron("Turkey CAPW", AIRBASE.Syria.Incirlik, {"CAP_Blue_Turkey"}, 4)
-            A2ADispatcherTurkey:SetSquadronCap2("Turkey CAPW", 1000, 2000, 2000, 10000, "BARO", ZoneCAPTurkeyW, 600, 800, 4000, 8000, "RADIO")
+            A2ADispatcherTurkey:SetSquadronCap2("Turkey CAPW", 1000, 2000, 2000, 10000, "BARO", ZoneCAPTurkeyW, 600, 800, 8000, 9000, "BARO")
+            A2ADispatcherTurkey:SetSquadronCapRacetrack("Turkey CAPW", 40000, 40000, 46, 46, 40*60, 40*60)
             A2ADispatcherTurkey:SetSquadronCapInterval("Turkey CAPW", 1, 60, 120, 1)
             A2ADispatcherTurkey:SetSquadronGrouping("Turkey CAPW", 2)
             -- -- CAP East
             -- A2ADispatcherTurkey:SetSquadron("Turkey CAPE", AIRBASE.Syria.Incirlik, {"CAP_Blue_Turkey"}, 4)
-            -- A2ADispatcherTurkey:SetSquadronCap2("Turkey CAPE", 1000, 2000, 2000, 10000, "BARO", ZoneCAPTurkeyE, 600, 800, 4000, 8000, "RADIO")
+            -- A2ADispatcherTurkey:SetSquadronCap2("Turkey CAPE", 1000, 2000, 2000, 10000, "BARO", ZoneCAPTurkeyE, 600, 600, 8000, 8000, "BARO")
+            -- A2ADispatcherTurkey:SetSquadronCapRacetrack("Turkey CAPE", 40000, 40000, 70, 70, 40*60, 40*60)
             -- A2ADispatcherTurkey:SetSquadronCapInterval("Turkey CAPE", 1, 60, 120, 1)
             -- A2ADispatcherTurkey:SetSquadronGrouping("Turkey CAPE", 2)
             -- GCI
-            A2ADispatcherTurkey:SetSquadron("Turkey GCI", AIRBASE.Syria.Incirlik, {"GCI_Blue_Turkey"}, 2)
+            A2ADispatcherTurkey:SetSquadron("Turkey GCI", AIRBASE.Syria.Incirlik, {"GCI_Blue_Turkey"}, 4)
             A2ADispatcherTurkey:SetSquadronGrouping("Turkey GCI", 2)
             A2ADispatcherTurkey:SetSquadronGci("Turkey GCI", 1000, 2000)
         end
@@ -446,8 +453,8 @@ RAT.ATCswitch = false
 
         function CAPGCI_SYRIA ()
             -- CAP/GCI Syria
-            local ZoneCAPSyriaW = ZONE_POLYGON:New("WPT_CAP_SyriaW", GROUP:FindByName("WPT_CAP_SyriaW"))
-            local ZoneCAPSyriaE = ZONE_POLYGON:New("WPT_CAP_SyriaE", GROUP:FindByName("WPT_CAP_SyriaE"))
+            local ZoneCAPSyriaW = ZONE:New("ZONE_CAP_SyriaW")
+            local ZoneCAPSyriaE = ZONE:New("ZONE_CAP_SyriaE")
             local DetectionSyria = DETECTION_AREAS:New(EWR.Syria, 150000)
             local A2ADispatcherSyria = AI_A2A_DISPATCHER:New(DetectionSyria)
             A2ADispatcherSyria:SetBorderZone({BORDER.Blue.Syria})
@@ -459,20 +466,22 @@ RAT.ATCswitch = false
             A2ADispatcherSyria:SetTacticalDisplay(TacticalDisplay)
             -- CAP West
             A2ADispatcherSyria:SetSquadron("Syria CAPW", AIRBASE.Syria.Hama, {"CAP_Blue_Syria"}, 4)
-            A2ADispatcherSyria:SetSquadronCap2("Syria CAPW", 1000, 2000, 2000, 10000, "BARO", ZoneCAPSyriaW, 600, 800, 4000, 8000, "RADIO")
+            A2ADispatcherSyria:SetSquadronCap2("Syria CAPW", 1000, 2000, 2000, 10000, "BARO", ZoneCAPSyriaW, 600, 600, 8000, 8000, "BARO")
+            A2ADispatcherSyria:SetSquadronCapRacetrack("Syria CAPW", 40000, 40000, 94, 94, 40*60, 40*60)
             A2ADispatcherSyria:SetSquadronCapInterval("Syria CAPW", 1, 60, 120, 1)
             A2ADispatcherSyria:SetSquadronGrouping("Syria CAPW", 2)
             -- CAP East
             A2ADispatcherSyria:SetSquadron("Syria CAPE", AIRBASE.Syria.Palmyra, {"CAP_Blue_Syria"}, 4)
-            A2ADispatcherSyria:SetSquadronCap2("Syria CAPE", 1000, 2000, 2000, 10000, "BARO", ZoneCAPSyriaE, 600, 800, 4000, 8000, "RADIO")
+            A2ADispatcherSyria:SetSquadronCap2("Syria CAPE", 1000, 2000, 2000, 10000, "BARO", ZoneCAPSyriaE, 600, 600, 8000, 8000, "BARO")
+            A2ADispatcherSyria:SetSquadronCapRacetrack("Syria CAPE", 40000, 40000, 146, 146, 40*60, 40*60)
             A2ADispatcherSyria:SetSquadronCapInterval("Syria CAPE", 1, 60, 120, 1)
             A2ADispatcherSyria:SetSquadronGrouping("Syria CAPE", 2)
             -- GCI West
-            A2ADispatcherSyria:SetSquadron("Syria GCIW", AIRBASE.Syria.Abu_al_Duhur, {"GCI_Blue_Syria"}, 2)
+            A2ADispatcherSyria:SetSquadron("Syria GCIW", AIRBASE.Syria.Hama, {"GCI_Blue_Syria"}, 4)
             A2ADispatcherSyria:SetSquadronGrouping("Syria GCIW", 2)
             A2ADispatcherSyria:SetSquadronGci("Syria GCIW", 1000, 2000)
             -- GCI Est
-            A2ADispatcherSyria:SetSquadron("Syria GCIE", AIRBASE.Syria.Tabqa, {"GCI_Blue_Syria"}, 2)
+            A2ADispatcherSyria:SetSquadron("Syria GCIE", AIRBASE.Syria.Palmyra, {"GCI_Blue_Syria"}, 4)
             A2ADispatcherSyria:SetSquadronGrouping("Syria GCIE", 2)
             A2ADispatcherSyria:SetSquadronGci("Syria GCIE", 1000, 2000)
         end
@@ -481,7 +490,7 @@ RAT.ATCswitch = false
 
         function CAPGCI_RED ()
             -- CAP/GCI Red
-            local ZoneCAPRed = ZONE_POLYGON:New("WPT_CAP_Red", GROUP:FindByName("WPT_CAP_Red"))
+            local ZoneCAPRed = ZONE:New("ZONE_CAP_Red")
             local DetectionRed = DETECTION_AREAS:New(EWR.Red, 150000)
             local A2ADispatcherRed = AI_A2A_DISPATCHER:New(DetectionRed)
             A2ADispatcherRed:SetBorderZone({BORDER.Red})
@@ -493,7 +502,8 @@ RAT.ATCswitch = false
             A2ADispatcherRed:SetTacticalDisplay(TacticalDisplay)
             -- CAP
             A2ADispatcherRed:SetSquadron("Red CAP", AIRBASE.Syria.An_Nasiriyah, {"CAP_Red"}, 4)
-            A2ADispatcherRed:SetSquadronCap2("Red CAP", 1000, 2000, 2000, 10000, "BARO", ZoneCAPRed, 600, 800, 4000, 8000, "RADIO")
+            A2ADispatcherRed:SetSquadronCap2("Red CAP", 1000, 2000, 2000, 10000, "BARO", ZoneCAPRed, 600, 600, 8000, 8000, "BARO")
+            A2ADispatcherRed:SetSquadronCapRacetrack("Red CAP", 40000, 40000, 137, 137, 40*60, 40*60)
             A2ADispatcherRed:SetSquadronCapInterval("Red CAP", 1, 60, 120, 1)
             A2ADispatcherRed:SetSquadronGrouping("Red CAP", 2)
             -- GCI Nord
@@ -513,9 +523,9 @@ RAT.ATCswitch = false
     -- RED Ambiance
 
             -- AUFTRAG ORBIT
-            local auftragOrbitAmbiance = AUFTRAG:NewORBIT_CIRCLE(ZONE:New("ZONE_Ambiance-1"):GetCoordinate(), 3000, 100)
+            local auftragOrbitAmbiance = AUFTRAG:NewORBIT(ZONE:New("ZONE_Ambiance-1"):GetCoordinate(), 2700, 100)
             -- FLIGHTGROUP
-            local Ambiance_Red_Mi8 = FLIGHTGROUP:New("Ambiance_Red_Mi8")
+            local Ambiance_Red_Mi8 = FLIGHTGROUP:New("Ambiance_Red_Huey")
             Ambiance_Red_Mi8:SetDefaultFormation(ENUMS.Formation.RotaryWing.EchelonRight.D70)
             Ambiance_Red_Mi8:AddMission(auftragOrbitAmbiance)
             Ambiance_Red_Mi8:Activate()
@@ -528,7 +538,7 @@ RAT.ATCswitch = false
 
     -- RED Tankers
 
-        function Auftrag_M01_Red_Tankers ()
+        function Auftrag_Red_Tankers ()
 
             -- -- Texaco KC130
             -- LaunchTanker (
@@ -594,4 +604,4 @@ RAT.ATCswitch = false
             CAPGCI_SYRIA()
             CAPGCI_RED()
             Spawn_EWR_Red()
-            Auftrag_M01_Red_Tankers()
+            Auftrag_Red_Tankers()
