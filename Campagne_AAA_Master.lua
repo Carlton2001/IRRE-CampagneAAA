@@ -29,9 +29,9 @@ RAT.ATCswitch = false
     -- Direction des vents (cf ME)
 
     local WIND = {}
-    WIND.High   = 210   -- 26000 ft
-    WIND.Medium = 207   -- 6600 ft
-    WIND.Low    = 205   -- 1600 ft
+    WIND.High   = 215   -- 26000 ft
+    WIND.Medium = 210   -- 6600 ft
+    WIND.Low    = 235   -- 1600 ft
 
 ---------------------------------------------------------------------------------------------------
 -- INITIALISATIONS
@@ -383,6 +383,7 @@ RAT.ATCswitch = false
             -- CAP 2
             -- A2ADispatcherOTAN:SetSquadron("OTAN CAP2", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"CAP_Blue_OTAN"}, 4)
             -- A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP2", 1000, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 650, 8000, 9000, "BARO")
+            -- A2ADispatcherOTAN:SetSquadronCapRacetrack("OTAN CAP2", 40000, 40000, 30, 30, 40*60, 40*60)
             -- A2ADispatcherOTAN:SetSquadronCapInterval("OTAN CAP2", 1, 60, 120, 1)
             -- A2ADispatcherOTAN:SetSquadronGrouping("OTAN CAP2", 2)
             -- GCI
@@ -467,13 +468,13 @@ RAT.ATCswitch = false
             -- CAP West
             A2ADispatcherSyria:SetSquadron("Syria CAPW", AIRBASE.Syria.Hama, {"CAP_Blue_Syria"}, 4)
             A2ADispatcherSyria:SetSquadronCap2("Syria CAPW", 1000, 2000, 2000, 10000, "BARO", ZoneCAPSyriaW, 600, 600, 8000, 8000, "BARO")
-            A2ADispatcherSyria:SetSquadronCapRacetrack("Syria CAPW", 40000, 40000, 94, 94, 40*60, 40*60)
+            A2ADispatcherSyria:SetSquadronCapRacetrack("Syria CAPW", 40000, 40000, 100, 100, 40*60, 40*60)
             A2ADispatcherSyria:SetSquadronCapInterval("Syria CAPW", 1, 60, 120, 1)
             A2ADispatcherSyria:SetSquadronGrouping("Syria CAPW", 2)
             -- CAP East
             A2ADispatcherSyria:SetSquadron("Syria CAPE", AIRBASE.Syria.Palmyra, {"CAP_Blue_Syria"}, 4)
             A2ADispatcherSyria:SetSquadronCap2("Syria CAPE", 1000, 2000, 2000, 10000, "BARO", ZoneCAPSyriaE, 600, 600, 8000, 8000, "BARO")
-            A2ADispatcherSyria:SetSquadronCapRacetrack("Syria CAPE", 40000, 40000, 146, 146, 40*60, 40*60)
+            A2ADispatcherSyria:SetSquadronCapRacetrack("Syria CAPE", 40000, 40000, 90, 90, 40*60, 40*60)
             A2ADispatcherSyria:SetSquadronCapInterval("Syria CAPE", 1, 60, 120, 1)
             A2ADispatcherSyria:SetSquadronGrouping("Syria CAPE", 2)
             -- GCI West
@@ -494,7 +495,7 @@ RAT.ATCswitch = false
             local DetectionRed = DETECTION_AREAS:New(EWR.Red, 150000)
             local A2ADispatcherRed = AI_A2A_DISPATCHER:New(DetectionRed)
             A2ADispatcherRed:SetBorderZone({BORDER.Red})
-            A2ADispatcherRed:SetDisengageRadius(125000)
+            A2ADispatcherRed:SetDisengageRadius(150000)
             A2ADispatcherRed:SetDefaultGrouping(2)
             A2ADispatcherRed:SetDefaultOverhead(1)
             A2ADispatcherRed:SetDefaultTakeoffInAir()
@@ -503,7 +504,7 @@ RAT.ATCswitch = false
             -- CAP
             A2ADispatcherRed:SetSquadron("Red CAP", AIRBASE.Syria.An_Nasiriyah, {"CAP_Red"}, 4)
             A2ADispatcherRed:SetSquadronCap2("Red CAP", 1000, 2000, 2000, 10000, "BARO", ZoneCAPRed, 600, 600, 8000, 8000, "BARO")
-            A2ADispatcherRed:SetSquadronCapRacetrack("Red CAP", 40000, 40000, 137, 137, 40*60, 40*60)
+            A2ADispatcherRed:SetSquadronCapRacetrack("Red CAP", 40000, 40000, 122, 122, 40*60, 40*60)
             A2ADispatcherRed:SetSquadronCapInterval("Red CAP", 1, 60, 120, 1)
             A2ADispatcherRed:SetSquadronGrouping("Red CAP", 2)
             -- GCI Nord
@@ -511,7 +512,7 @@ RAT.ATCswitch = false
             A2ADispatcherRed:SetSquadronGrouping("Red GCIN", 2)
             A2ADispatcherRed:SetSquadronGci("Red GCIN", 1000, 2000)
             -- GCI Sud
-            A2ADispatcherRed:SetSquadron("Red GCIS", AIRBASE.Syria.Mezzeh, {"GCI_Red"}, 2)
+            A2ADispatcherRed:SetSquadron("Red GCIS", AIRBASE.Syria.Marj_Ruhayyil, {"GCI_Red"}, 2)
             A2ADispatcherRed:SetSquadronGrouping("Red GCIS", 2)
             A2ADispatcherRed:SetSquadronGci("Red GCIS", 1000, 2000)
         end
@@ -540,24 +541,23 @@ RAT.ATCswitch = false
 
         function Auftrag_Red_Tankers ()
 
-            -- -- Texaco KC130
-            -- LaunchTanker (
-            --     "TANKER_Red_KC130", -- GroupName
-            --     TANKER.KC130, -- TANKERTYPE
-            --     {["ZoneName"] = "ZONE_Tanker_Red-1", ["Altitude"] = 18000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
-            --     {["Frequency"] = RadioTanker1, ["Callsign"] = CALLSIGN.Tanker.Texaco}, -- COMMS
-            --     AIRBASE.Syria.Damascus, -- HomeBase
-            --     {["Channel"] = 28, ["Morse"] = "TEX", ["Band"] = "Y"}, -- TACAN
-            --     10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
-            --     10, -- DepartureTime (s)
-            --     {["Name"] = "Escort_Red_Tanker1", ["Callsign"] = CALLSIGN.Aircraft.Springfield, ["CallsignNumber"] = 1} -- ESCORT
-            -- )
+            -- Texaco KC130
+            LaunchTanker (
+                "TANKER_Red_KC130", -- GroupName
+                TANKER.KC130, -- TANKERTYPE
+                {["ZoneName"] = "ZONE_Tanker_Red-1", ["Altitude"] = 2500, ["Speed"] = 300, ["Heading"] = WIND.Low, ["Leg"] = 20}, -- PATTERN
+                {["Frequency"] = RadioTanker1, ["Callsign"] = CALLSIGN.Tanker.Texaco}, -- COMMS
+                AIRBASE.Syria.Damascus, -- HomeBase
+                {["Channel"] = 28, ["Morse"] = "TEX", ["Band"] = "Y"}, -- TACAN
+                10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
+                10 -- DepartureTime (s)
+            )
 
             -- Arco IL78
             LaunchTanker (
                 "TANKER_Red_IL78", -- GroupName
                 TANKER.IL78, -- TANKERTYPE
-                {["ZoneName"] = "ZONE_Tanker_Red-1", ["Altitude"] = 20000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
+                {["ZoneName"] = "ZONE_Tanker_Red-2", ["Altitude"] = 20000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
                 {["Frequency"] = RadioTanker2, ["Callsign"] = CALLSIGN.Tanker.Arco}, -- COMMS
                 AIRBASE.Syria.Damascus, -- HomeBase
                 {["Channel"] = 25, ["Morse"] = "ARC", ["Band"] = "Y"}, -- TACAN
@@ -570,7 +570,7 @@ RAT.ATCswitch = false
             LaunchTanker (
                 "TANKER_Red_KC135", -- GroupName
                 TANKER.KC135, -- TANKERTYPE
-                {["ZoneName"] = "ZONE_Tanker_Red-2", ["Altitude"] = 18000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
+                {["ZoneName"] = "ZONE_Tanker_Red-3", ["Altitude"] = 18000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
                 {["Frequency"] = RadioTanker3, ["Callsign"] = CALLSIGN.Tanker.Shell}, -- COMMS
                 AIRBASE.Syria.Damascus, -- HomeBase
                 {["Channel"] = 34, ["Morse"] = "SHL", ["Band"] = "Y"}, -- TACAN
@@ -583,7 +583,7 @@ RAT.ATCswitch = false
             -- LaunchTanker (
             --     "TANKER_Red_KC135MPRS", -- GroupName
             --     TANKER.KC135MPRS, -- TANKERTYPE
-            --     {["ZoneName"] = "ZONE_Tanker_Red-2", ["Altitude"] = 20000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
+            --     {["ZoneName"] = "ZONE_Tanker_Red-4", ["Altitude"] = 20000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
             --     {["Frequency"] = RadioTanker4, ["Callsign"] = CALLSIGN.Tanker.Texaco}, -- COMMS
             --     AIRBASE.Syria.Damascus, -- HomeBase
             --     {["Channel"] = 39, ["Morse"] = "TEX", ["Band"] = "Y"}, -- TACAN
