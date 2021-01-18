@@ -16,7 +16,7 @@ RAT.ATCswitch = false
 
     -- A désactiver en PROD
 
-    local EnvProd = true
+    local EnvProd = false
 
     -- Fréquences Radio - Attention Callsigns & Radios du EWR et des GCI/CAP à paramétrer dans l'EM
 
@@ -472,7 +472,7 @@ RAT.ATCswitch = false
             A2ADispatcherSyria:SetSquadronCapInterval("Syria CAPW", 1, 60, 120, 1)
             A2ADispatcherSyria:SetSquadronGrouping("Syria CAPW", 2)
             -- CAP East
-            A2ADispatcherSyria:SetSquadron("Syria CAPE", AIRBASE.Syria.Palmyra, {"CAP_Blue_Syria"}, 4)
+            A2ADispatcherSyria:SetSquadron("Syria CAPE", AIRBASE.Syria.Tabqa, {"CAP_Blue_Syria"}, 4)
             A2ADispatcherSyria:SetSquadronCap2("Syria CAPE", 1000, 2000, 2000, 10000, "BARO", ZoneCAPSyriaE, 600, 600, 8000, 8000, "BARO")
             A2ADispatcherSyria:SetSquadronCapRacetrack("Syria CAPE", 40000, 40000, 90, 90, 40*60, 40*60)
             A2ADispatcherSyria:SetSquadronCapInterval("Syria CAPE", 1, 60, 120, 1)
@@ -482,7 +482,7 @@ RAT.ATCswitch = false
             A2ADispatcherSyria:SetSquadronGrouping("Syria GCIW", 2)
             A2ADispatcherSyria:SetSquadronGci("Syria GCIW", 1000, 2000)
             -- GCI Est
-            A2ADispatcherSyria:SetSquadron("Syria GCIE", AIRBASE.Syria.Palmyra, {"GCI_Blue_Syria"}, 4)
+            A2ADispatcherSyria:SetSquadron("Syria GCIE", AIRBASE.Syria.Tabqa, {"GCI_Blue_Syria"}, 4)
             A2ADispatcherSyria:SetSquadronGrouping("Syria GCIE", 2)
             A2ADispatcherSyria:SetSquadronGci("Syria GCIE", 1000, 2000)
         end
