@@ -566,18 +566,18 @@ RAT.ATCswitch = false
                 {["Name"] = "Escort_Red_Tanker2", ["Callsign"] = CALLSIGN.Aircraft.Springfield, ["CallsignNumber"] = 2} -- ESCORT
             )
 
-            -- Shell KC135
-            LaunchTanker (
-                "TANKER_Red_KC135", -- GroupName
-                TANKER.KC135, -- TANKERTYPE
-                {["ZoneName"] = "ZONE_Tanker_Red-3", ["Altitude"] = 18000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
-                {["Frequency"] = RadioTanker3, ["Callsign"] = CALLSIGN.Tanker.Shell}, -- COMMS
-                AIRBASE.Syria.Damascus, -- HomeBase
-                {["Channel"] = 34, ["Morse"] = "SHL", ["Band"] = "Y"}, -- TACAN
-                10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
-                10, -- DepartureTime (s)
-                {["Name"] = "Escort_Red_Tanker3", ["Callsign"] = CALLSIGN.Aircraft.Springfield, ["CallsignNumber"] = 3} -- ESCORT
-            )
+            -- -- Shell KC135
+            -- LaunchTanker (
+            --     "TANKER_Red_KC135", -- GroupName
+            --     TANKER.KC135, -- TANKERTYPE
+            --     {["ZoneName"] = "ZONE_Tanker_Red-3", ["Altitude"] = 18000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
+            --     {["Frequency"] = RadioTanker3, ["Callsign"] = CALLSIGN.Tanker.Shell}, -- COMMS
+            --     AIRBASE.Syria.Damascus, -- HomeBase
+            --     {["Channel"] = 34, ["Morse"] = "SHL", ["Band"] = "Y"}, -- TACAN
+            --     10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
+            --     10, -- DepartureTime (s)
+            --     {["Name"] = "Escort_Red_Tanker3", ["Callsign"] = CALLSIGN.Aircraft.Springfield, ["CallsignNumber"] = 3} -- ESCORT
+            -- )
 
             -- -- Texaco KC135MPRS
             -- LaunchTanker (
