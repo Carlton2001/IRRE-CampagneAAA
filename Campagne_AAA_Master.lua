@@ -16,7 +16,7 @@ RAT.ATCswitch = false
 
     -- A désactiver en PROD
 
-    local EnvProd = false
+    local EnvProd = true
 
     -- Fréquences Radio - Attention Callsigns & Radios du EWR et des GCI/CAP à paramétrer dans l'EM
 
@@ -146,10 +146,10 @@ RAT.ATCswitch = false
     AIR.Red     = {}
     AIR.Blue    = {}
 
-    AIR.Red.All             = SET_GROUP:New():FilterCoalitions("red"):FilterCategories({"plane", "helicopter"}):FilterStart()
+    AIR.Red.All             = SET_GROUP:New():FilterCoalitions("red"):FilterCategories({"plane"}):FilterStart()
     AIR.Red.GCICAP          = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterPrefixes{"CAP_Red", "GCI_Red"}:FilterStart()
     AIR.Red.Players         = SET_GROUP:New():FilterCoalitions("red"):FilterCategories({"plane", "helicopter"}):FilterPrefixes{"Cli_"}:FilterStart()
-    AIR.Blue.All            = SET_GROUP:New():FilterCoalitions("blue"):FilterCategories({"plane", "helicopter"}):FilterStart()
+    AIR.Blue.All            = SET_GROUP:New():FilterCoalitions("blue"):FilterCategories({"plane"}):FilterStart()
     AIR.Blue.IsraelOTAN     = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(COUNTRY.IsraelOTAN):FilterCategoryAirplane():FilterStart()
     AIR.Blue.TurkeySyria    = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(COUNTRY.TurkeySyria):FilterCategoryAirplane():FilterStart()
 
@@ -500,7 +500,8 @@ RAT.ATCswitch = false
             A2ADispatcherRed:SetDefaultOverhead(1)
             A2ADispatcherRed:SetDefaultTakeoffInAir()
             A2ADispatcherRed:SetDefaultLandingAtRunway()
-            A2ADispatcherRed:SetTacticalDisplay(TacticalDisplay)
+            A2ADispatcherRed:SetDefaultLandingAtRunway()
+            A2ADispatcherRed:SetDefaultTanker("TANKER_Red_IL78")
             -- CAP
             A2ADispatcherRed:SetSquadron("Red CAP", AIRBASE.Syria.An_Nasiriyah, {"CAP_Red"}, 4)
             A2ADispatcherRed:SetSquadronCap2("Red CAP", 1000, 2000, 2000, 10000, "BARO", ZoneCAPRed, 600, 600, 8000, 8000, "BARO")
