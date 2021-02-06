@@ -595,6 +595,36 @@ RAT.ATCswitch = false
 
         end
 
+    -- Interception Général
+
+        local CivilFlight = FLIGHTGROUP:New("M03_Neutral_General")
+
+        function CivilRTB()
+            local TimerVar = TIMER:New(
+                function()
+                    MessageToAll("OK, RTB ;(", 40)
+                    CivilFlight:RTB(AIRBASE:FindByName(AIRBASE.Syria.Beirut_Rafic_Hariri))
+                    MenuCivilRTB:Remove()
+                    SchedulerRefreshMenus:Stop()
+                end
+            )
+            TimerVar:Start(1)
+        end
+
+        SchedulerRefreshMenus = SCHEDULER:New( nil,
+            function()
+                if AIR.Red.Players:CountAlive() >= 1 then
+                    local zone_CivilFlight = ZONE_GROUP:New("Zone_CivilFlight", CivilFlight, 400)
+                    if AIR.Red.Players:AnyInZone(zone_CivilFlight) then
+                        MessageToAll("In the zone", 2)
+                        MenuCivilRTB = MENU_MISSION_COMMAND:New("ReturnToBase", nil, CivilRTB)
+                    else
+                        if MenuCivilRTB then MenuCivilRTB:Remove() end
+                    end
+                end
+            end, {}, 1, 5
+        )
+
     -- Executions
 
         -- Configuration Generale
