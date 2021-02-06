@@ -148,6 +148,7 @@ RAT.ATCswitch = false
     AIR.Red.All             = SET_GROUP:New():FilterCoalitions("red"):FilterCategories({"plane"}):FilterStart()
     AIR.Red.GCICAP          = SET_GROUP:New():FilterCoalitions("red"):FilterCategoryAirplane():FilterPrefixes{"CAP_Red", "GCI_Red"}:FilterStart()
     AIR.Red.Players         = SET_GROUP:New():FilterCoalitions("red"):FilterCategories({"plane", "helicopter"}):FilterPrefixes{"Cli_"}:FilterStart()
+    AIR.Red.PlayersHelos    = SET_GROUP:New():FilterCoalitions("red"):FilterCategories({"helicopter"}):FilterPrefixes{"Cli_"}:FilterStart()
     AIR.Blue.All            = SET_GROUP:New():FilterCoalitions("blue"):FilterCategories({"plane"}):FilterStart()
     AIR.Blue.IsraelOTAN     = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(COUNTRY.IsraelOTAN):FilterCategoryAirplane():FilterStart()
     AIR.Blue.TurkeySyria    = SET_GROUP:New():FilterCoalitions("blue"):FilterCountries(COUNTRY.TurkeySyria):FilterCategoryAirplane():FilterStart()
@@ -624,6 +625,30 @@ RAT.ATCswitch = false
                 end
             end, {}, 1, 5
         )
+
+    -- Récupération pilotes
+
+        local ZoneFumiWest = ZONE:New("M03_Zone_FumiWest")
+        local ZoneFumiEast = ZONE:New("M03_Zone_FumiEast")
+
+        local ZoneFumiWest_Once = false
+        local ZoneFumiEast_Once = false
+
+        function RecupSmoke (ZoneFumi)
+            if AIR.Red.PlayersHelos:AnyInZone(ZoneFumiWest) and ZoneFumiWest_Once == false then
+                ZoneFumiWest:GetCoordinate():SmokeGreen()
+                ZoneFumiWest_Once = true
+            end
+            if AIR.Red.PlayersHelos:AnyInZone(ZoneFumiEast) and ZoneFumiEast_Once == false then
+                ZoneFumiEast:GetCoordinate():SmokeGreen()
+                ZoneFumiEast_Once = true
+            end
+            if ZoneFumiWest_Once == true and ZoneFumiEast_Once == true then
+                SchedulerStartSmoke:Stop()
+            end
+        end
+
+        SchedulerStartSmoke = SCHEDULER:New(nil, RecupSmoke, {}, 1, 10)
 
     -- Executions
 
