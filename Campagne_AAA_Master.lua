@@ -650,6 +650,28 @@ RAT.ATCswitch = false
 
         SchedulerStartSmoke = SCHEDULER:New(nil, RecupSmoke, {}, 1, 10)
 
+    -- Gestion des Randoms Bleus
+
+        local RandomNumber = 19 -- Nombre de positions
+        local RandomPrefix = "M03_Blue_RDM_" -- Prefixe des groupes
+        local ApparitionChance = 66 -- %
+        local RandomName = nil
+        local RandomResult = 0
+        for i = 1, RandomNumber, 1 do
+            RandomName = RandomPrefix .. i
+            if EnvProd then
+                RandomResult = math.random(100)
+                if RandomResult <= ApparitionChance then
+                    GROUP:FindByName(RandomName):Activate()
+                    BASE:E(RandomName .. " Activated")
+                end
+            else
+                GROUP:FindByName(RandomName):Activate()
+                BASE:E(RandomName .. " Activated")
+            end
+        end
+
+
     -- Executions
 
         -- Configuration Generale
