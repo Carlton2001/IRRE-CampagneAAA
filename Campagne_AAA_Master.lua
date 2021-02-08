@@ -29,9 +29,9 @@ RAT.ATCswitch = false
     -- Direction des vents (cf ME)
 
     local WIND = {}
-    WIND.High   = 215   -- 26000 ft
-    WIND.Medium = 210   -- 6600 ft
-    WIND.Low    = 235   -- 1600 ft
+    WIND.High   = 47   -- 26000 ft
+    WIND.Medium = 40   -- 6600 ft
+    WIND.Low    = 42   -- 1600 ft
 
 ---------------------------------------------------------------------------------------------------
 -- INITIALISATIONS
@@ -381,11 +381,11 @@ RAT.ATCswitch = false
             A2ADispatcherOTAN:SetSquadronCapInterval("OTAN CAP1", 1, 60, 120, 1)
             A2ADispatcherOTAN:SetSquadronGrouping("OTAN CAP1", 2)
             -- CAP 2
-            -- A2ADispatcherOTAN:SetSquadron("OTAN CAP2", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"CAP_Blue_OTAN"}, 4)
-            -- A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP2", 800, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 650, 8000, 9000, "BARO")
-            -- A2ADispatcherOTAN:SetSquadronCapRacetrack("OTAN CAP2", 40000, 40000, 30, 30, 40*60, 40*60)
-            -- A2ADispatcherOTAN:SetSquadronCapInterval("OTAN CAP2", 1, 60, 120, 1)
-            -- A2ADispatcherOTAN:SetSquadronGrouping("OTAN CAP2", 2)
+            A2ADispatcherOTAN:SetSquadron("OTAN CAP2", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"CAP_Blue_OTAN"}, 4)
+            A2ADispatcherOTAN:SetSquadronCap2("OTAN CAP2", 800, 2000, 2000, 10000, "BARO", ZoneCAPOTAN, 600, 650, 8000, 9000, "BARO")
+            A2ADispatcherOTAN:SetSquadronCapRacetrack("OTAN CAP2", 40000, 40000, 30, 30, 40*60, 40*60)
+            A2ADispatcherOTAN:SetSquadronCapInterval("OTAN CAP2", 1, 60, 120, 1)
+            A2ADispatcherOTAN:SetSquadronGrouping("OTAN CAP2", 2)
             -- GCI
             A2ADispatcherOTAN:SetSquadron("OTAN GCI", "NAVAL_Blue_Cyprus_OTAN_Carrier", {"GCI_Blue_OTAN"}, 4)
             A2ADispatcherOTAN:SetSquadronGrouping("OTAN GCI", 2)
@@ -466,23 +466,23 @@ RAT.ATCswitch = false
             A2ADispatcherSyria:SetDefaultLandingAtRunway()
             A2ADispatcherSyria:SetTacticalDisplay(TacticalDisplay)
             -- CAP West
-            A2ADispatcherSyria:SetSquadron("Syria CAPW", AIRBASE.Syria.Hama, {"CAP_Blue_Syria"}, 4)
+            A2ADispatcherSyria:SetSquadron("Syria CAPW", AIRBASE.Syria.Abu_al_Duhur, {"GCI_Blue_Syria"}, 4)
             A2ADispatcherSyria:SetSquadronCap2("Syria CAPW", 800, 2000, 2000, 10000, "BARO", ZoneCAPSyriaW, 600, 600, 8000, 9000, "BARO")
             A2ADispatcherSyria:SetSquadronCapRacetrack("Syria CAPW", 40000, 40000, 100, 100, 40*60, 40*60)
             A2ADispatcherSyria:SetSquadronCapInterval("Syria CAPW", 1, 60, 120, 1)
             A2ADispatcherSyria:SetSquadronGrouping("Syria CAPW", 2)
             -- CAP East
-            A2ADispatcherSyria:SetSquadron("Syria CAPE", AIRBASE.Syria.Tabqa, {"CAP_Blue_Syria"}, 4)
+            A2ADispatcherSyria:SetSquadron("Syria CAPE", AIRBASE.Syria.Abu_al_Duhur, {"CAP_Blue_Syria"}, 4)
             A2ADispatcherSyria:SetSquadronCap2("Syria CAPE", 800, 2000, 2000, 10000, "BARO", ZoneCAPSyriaE, 600, 600, 8000, 9000, "BARO")
             A2ADispatcherSyria:SetSquadronCapRacetrack("Syria CAPE", 40000, 40000, 90, 90, 40*60, 40*60)
             A2ADispatcherSyria:SetSquadronCapInterval("Syria CAPE", 1, 60, 120, 1)
             A2ADispatcherSyria:SetSquadronGrouping("Syria CAPE", 2)
             -- GCI West
-            A2ADispatcherSyria:SetSquadron("Syria GCIW", AIRBASE.Syria.Hama, {"GCI_Blue_Syria"}, 4)
+            A2ADispatcherSyria:SetSquadron("Syria GCIW", AIRBASE.Syria.Abu_al_Duhur, {"GCI_Blue_Syria"}, 2)
             A2ADispatcherSyria:SetSquadronGrouping("Syria GCIW", 2)
             A2ADispatcherSyria:SetSquadronGci("Syria GCIW", 800, 2000)
             -- GCI Est
-            A2ADispatcherSyria:SetSquadron("Syria GCIE", AIRBASE.Syria.Tabqa, {"GCI_Blue_Syria"}, 4)
+            A2ADispatcherSyria:SetSquadron("Syria GCIE", AIRBASE.Syria.Abu_al_Duhur, {"GCI_Blue_Syria"}, 2)
             A2ADispatcherSyria:SetSquadronGrouping("Syria GCIE", 2)
             A2ADispatcherSyria:SetSquadronGci("Syria GCIE", 800, 2000)
         end
@@ -527,10 +527,10 @@ RAT.ATCswitch = false
             -- AUFTRAG ORBIT
             local auftragOrbitAmbiance = AUFTRAG:NewORBIT(ZONE:New("ZONE_Ambiance-1"):GetCoordinate(), 2700, 100)
             -- FLIGHTGROUP
-            local Ambiance_Red_Mi8 = FLIGHTGROUP:New("Ambiance_Red_Huey")
-            Ambiance_Red_Mi8:SetDefaultFormation(ENUMS.Formation.RotaryWing.EchelonRight.D70)
-            Ambiance_Red_Mi8:AddMission(auftragOrbitAmbiance)
-            Ambiance_Red_Mi8:Activate()
+            local Ambiance_Red_Mezzeh = FLIGHTGROUP:New("Ambiance_Red_Huey")
+            Ambiance_Red_Mezzeh:SetDefaultFormation(ENUMS.Formation.RotaryWing.EchelonRight.D70)
+            Ambiance_Red_Mezzeh:AddMission(auftragOrbitAmbiance)
+            Ambiance_Red_Mezzeh:Activate()
 
     -- RED EWR
 
@@ -568,18 +568,18 @@ RAT.ATCswitch = false
                 {["Name"] = "Escort_Red_Tanker2", ["Callsign"] = CALLSIGN.Aircraft.Springfield, ["CallsignNumber"] = 2} -- ESCORT
             )
 
-            -- Shell KC135
-            LaunchTanker (
-                "TANKER_Red_KC135", -- GroupName
-                TANKER.KC135, -- TANKERTYPE
-                {["ZoneName"] = "ZONE_Tanker_Red-3", ["Altitude"] = 18000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
-                {["Frequency"] = RadioTanker3, ["Callsign"] = CALLSIGN.Tanker.Shell}, -- COMMS
-                AIRBASE.Syria.Damascus, -- HomeBase
-                {["Channel"] = 34, ["Morse"] = "SHL", ["Band"] = "Y"}, -- TACAN
-                10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
-                10, -- DepartureTime (s)
-                {["Name"] = "Escort_Red_Tanker3", ["Callsign"] = CALLSIGN.Aircraft.Springfield, ["CallsignNumber"] = 3} -- ESCORT
-            )
+            -- -- Shell KC135
+            -- LaunchTanker (
+            --     "TANKER_Red_KC135", -- GroupName
+            --     TANKER.KC135, -- TANKERTYPE
+            --     {["ZoneName"] = "ZONE_Tanker_Red-3", ["Altitude"] = 18000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
+            --     {["Frequency"] = RadioTanker3, ["Callsign"] = CALLSIGN.Tanker.Shell}, -- COMMS
+            --     AIRBASE.Syria.Damascus, -- HomeBase
+            --     {["Channel"] = 34, ["Morse"] = "SHL", ["Band"] = "Y"}, -- TACAN
+            --     10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
+            --     10, -- DepartureTime (s)
+            --     {["Name"] = "Escort_Red_Tanker3", ["Callsign"] = CALLSIGN.Aircraft.Springfield, ["CallsignNumber"] = 3} -- ESCORT
+            -- )
 
             -- -- Texaco KC135MPRS
             -- LaunchTanker (
@@ -596,81 +596,117 @@ RAT.ATCswitch = false
 
         end
 
-    -- Interception Général
 
-        local CivilFlight = FLIGHTGROUP:New("M03_Neutral_General")
 
-        function CivilRTB()
-            local TimerVar = TIMER:New(
-                function()
-                    MessageToAll("OK, RTB ;(", 40)
-                    CivilFlight:RTB(AIRBASE:FindByName(AIRBASE.Syria.Beirut_Rafic_Hariri))
-                    MenuCivilRTB:Remove()
-                    SchedulerRefreshMenus:Stop()
-                end
-            )
-            TimerVar:Start(1)
-        end
 
-        SchedulerRefreshMenus = SCHEDULER:New( nil,
-            function()
-                if AIR.Red.Players:CountAlive() >= 1 then
-                    local zone_CivilFlight = ZONE_GROUP:New("Zone_CivilFlight", CivilFlight, 400)
-                    if AIR.Red.Players:AnyInZone(zone_CivilFlight) then
-                        MessageToAll("In the zone", 2)
-                        MenuCivilRTB = MENU_MISSION_COMMAND:New("ReturnToBase", nil, CivilRTB)
-                    else
-                        if MenuCivilRTB then MenuCivilRTB:Remove() end
+    -- M03 Interception Général
+
+        function M03_Intercept_General()
+
+            local CivilFlight = FLIGHTGROUP:New("M03_Neutral_General")
+
+            function CivilRTB()
+
+                local TimerVar = TIMER:New(
+                    function()
+                        MessageToAll("OK, RTB ;(", 40)
+                        CivilFlight:RTB(AIRBASE:FindByName(AIRBASE.Syria.Beirut_Rafic_Hariri))
+                        MenuCivilRTB:Remove()
+                        SchedulerRefreshMenus:Stop()
                     end
-                end
-            end, {}, 1, 5
-        )
+                )
+                TimerVar:Start(1)
 
-    -- Récupération pilotes
-
-        local ZoneFumiWest = ZONE:New("M03_Zone_FumiWest")
-        local ZoneFumiEast = ZONE:New("M03_Zone_FumiEast")
-
-        local ZoneFumiWest_Once = false
-        local ZoneFumiEast_Once = false
-
-        function RecupSmoke (ZoneFumi)
-            if AIR.Red.PlayersHelos:AnyInZone(ZoneFumiWest) and ZoneFumiWest_Once == false then
-                ZoneFumiWest:GetCoordinate():SmokeGreen()
-                ZoneFumiWest_Once = true
             end
-            if AIR.Red.PlayersHelos:AnyInZone(ZoneFumiEast) and ZoneFumiEast_Once == false then
-                ZoneFumiEast:GetCoordinate():SmokeGreen()
-                ZoneFumiEast_Once = true
-            end
-            if ZoneFumiWest_Once == true and ZoneFumiEast_Once == true then
-                SchedulerStartSmoke:Stop()
-            end
+
+            SchedulerRefreshMenus = SCHEDULER:New( nil,
+                function()
+                    if AIR.Red.Players:CountAlive() >= 1 then
+                        local zone_CivilFlight = ZONE_GROUP:New("Zone_CivilFlight", CivilFlight, 400)
+                        if AIR.Red.Players:AnyInZone(zone_CivilFlight) then
+                            MessageToAll("In the zone", 2)
+                            MenuCivilRTB = MENU_MISSION_COMMAND:New("ReturnToBase", nil, CivilRTB)
+                        else
+                            if MenuCivilRTB then MenuCivilRTB:Remove() end
+                        end
+                    end
+                end, {}, 1, 5
+            )
+
         end
 
-        SchedulerStartSmoke = SCHEDULER:New(nil, RecupSmoke, {}, 1, 10)
+    -- M03 Récupération pilotes
 
-    -- Gestion des Randoms Bleus
+        function M03_PilotsFumis()
 
-        local RandomNumber = 19 -- Nombre de positions
-        local RandomPrefix = "M03_Blue_RDM_" -- Prefixe des groupes
-        local ApparitionChance = 66 -- %
-        local RandomName = nil
-        local RandomResult = 0
-        for i = 1, RandomNumber, 1 do
-            RandomName = RandomPrefix .. i
-            if EnvProd then
-                RandomResult = math.random(100)
-                if RandomResult <= ApparitionChance then
+            local ZoneFumiWest = ZONE:New("M03_Zone_FumiWest")
+            local ZoneFumiEast = ZONE:New("M03_Zone_FumiEast")
+
+            local ZoneFumiWest_Once = false
+            local ZoneFumiEast_Once = false
+
+            function RecupSmoke (ZoneFumi)
+                if AIR.Red.PlayersHelos:AnyInZone(ZoneFumiWest) and ZoneFumiWest_Once == false then
+                    ZoneFumiWest:GetCoordinate():SmokeGreen()
+                    ZoneFumiWest_Once = true
+                end
+                if AIR.Red.PlayersHelos:AnyInZone(ZoneFumiEast) and ZoneFumiEast_Once == false then
+                    ZoneFumiEast:GetCoordinate():SmokeGreen()
+                    ZoneFumiEast_Once = true
+                end
+                if ZoneFumiWest_Once == true and ZoneFumiEast_Once == true then
+                    SchedulerStartSmoke:Stop()
+                end
+            end
+
+            SchedulerStartSmoke = SCHEDULER:New(nil, RecupSmoke, {}, 1, 10)
+
+        end
+
+    -- M03 Gestion des Randoms Bleus
+
+        function M03_Randomize_BlueGroundAssets()
+
+            local RandomNumber = 19 -- Nombre de positions
+            local RandomPrefix = "M03_Blue_RDM_" -- Prefixe des groupes
+            local ApparitionChance = 75 -- %
+            local RandomName = nil
+            local RandomResult = 0
+            for i = 1, RandomNumber, 1 do
+                RandomName = RandomPrefix .. i
+                if EnvProd then
+                    RandomResult = math.random(100)
+                    if RandomResult <= ApparitionChance then
+                        GROUP:FindByName(RandomName):Activate()
+                        BASE:E(RandomName .. " Activated")
+                    end
+                else
                     GROUP:FindByName(RandomName):Activate()
                     BASE:E(RandomName .. " Activated")
                 end
-            else
-                GROUP:FindByName(RandomName):Activate()
-                BASE:E(RandomName .. " Activated")
             end
+
         end
 
+    -- M03 Attaque Blue
+
+        function M03_Blue_Attack()
+
+            local M03_Blue_Auftrag_AttackCAP = AUFTRAG:NewCAP(ZONE:New("M03_Zone_Blue_Attack"), 22000)
+            local M03_Blue_AttackCAP = FLIGHTGROUP:New("M03_Blue_AttackCAP")
+            M03_Blue_AttackCAP:AddMission(M03_Blue_Auftrag_AttackCAP)
+
+            local M03_TargetSEAD = GROUP:FindByName("M03_Red_SAM_AlQusayr")
+            local M03_Blue_Auftrag_AttackSEAD = AUFTRAG:NewBAI(M03_TargetSEAD, 7000):SetROT(ENUMS.ROT.EvadeFire)
+            local M03_Blue_AttackSEAD = FLIGHTGROUP:New("M03_Blue_AttackSEAD")
+            M03_Blue_AttackSEAD:AddMission(M03_Blue_Auftrag_AttackSEAD)
+
+            local M03_TargetRunway = AIRBASE:FindByName(AIRBASE.Syria.Al_Qusayr)
+            local M03_Blue_Auftrag_AttackRunway = AUFTRAG:NewBOMBRUNWAY(M03_TargetRunway, 4000)
+            local M03_Blue_AttackRunway = FLIGHTGROUP:New("M03_Blue_AttackRunway")
+            M03_Blue_AttackRunway:AddMission(M03_Blue_Auftrag_AttackRunway)
+
+        end
 
     -- Executions
 
@@ -683,3 +719,10 @@ RAT.ATCswitch = false
             CAPGCI_RED()
             Spawn_EWR_Red()
             Auftrag_Red_Tankers()
+
+        -- M03 Exec
+
+            M03_Randomize_BlueGroundAssets()
+            M03_PilotsFumis()
+            M03_Intercept_General()
+            BASE:ScheduleOnce(6000, function() M03_Blue_Attack() end)
