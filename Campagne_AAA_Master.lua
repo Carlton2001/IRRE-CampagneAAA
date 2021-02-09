@@ -725,4 +725,4 @@ RAT.ATCswitch = false
             M03_Randomize_BlueGroundAssets()
             M03_PilotsFumis()
             M03_Intercept_General()
-            BASE:ScheduleOnce(6000, function() M03_Blue_Attack() end)
+            BASE:ScheduleOnce(6600, function() M03_Blue_Attack() end)
