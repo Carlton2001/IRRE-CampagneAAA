@@ -609,8 +609,9 @@ RAT.ATCswitch = false
 
                 local TimerVar = TIMER:New(
                     function()
-                        MessageToAll("OK, RTB ;(", 40)
-                        CivilFlight:RTB(AIRBASE:FindByName(AIRBASE.Syria.Beirut_Rafic_Hariri))
+                        if EnvProd == false then MessageToAll("OK, RTB ;(", 5) end
+                        FunRadio:NewGenericTransmission("M03_DEROUTEMENT.ogg", RadioGeneral):Broadcast()
+                        BASE:ScheduleOnce(17, function() CivilFlight:RTB(AIRBASE:FindByName(AIRBASE.Syria.Beirut_Rafic_Hariri)) end)
                         MenuCivilRTB:Remove()
                         SchedulerRefreshMenus:Stop()
                     end
@@ -624,8 +625,8 @@ RAT.ATCswitch = false
                     if AIR.Red.Players:CountAlive() >= 1 then
                         local zone_CivilFlight = ZONE_GROUP:New("Zone_CivilFlight", CivilFlight, 400)
                         if AIR.Red.Players:AnyInZone(zone_CivilFlight) then
-                            MessageToAll("In the zone", 2)
-                            MenuCivilRTB = MENU_MISSION_COMMAND:New("ReturnToBase", nil, CivilRTB)
+                            if EnvProd == false then MessageToAll("In the zone", 5) end
+                            MenuCivilRTB = MENU_MISSION_COMMAND:New("RADIO : DEMANDER A ORAN-66 DE SE DÉROUTER VERS BEYROUTH", nil, CivilRTB)
                         else
                             if MenuCivilRTB then MenuCivilRTB:Remove() end
                         end
