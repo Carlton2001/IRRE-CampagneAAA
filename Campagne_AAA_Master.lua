@@ -113,7 +113,7 @@ RAT.ATCswitch = false
     SAM.Blue.Syria.Hama_Hawk        = GROUP:FindByName("SAM_Blue_Syria_Hama_Hawk"):Activate()
     SAM.Blue.Syria.Aleppo_S300      = GROUP:FindByName("SAM_Blue_Syria_Aleppo_S300"):Activate()
     SAM.Blue.Syria.Tabqa_S300       = GROUP:FindByName("SAM_Blue_Syria_Tabqa_S300"):Activate()
-    --SAM.Blue.Syria.Hama_SA15        = GROUP:FindByName("SAM_Blue_Syria_Hama_SA15"):Activate()
+    SAM.Blue.Syria.Hama_SA15        = GROUP:FindByName("SAM_Blue_Syria_Hama_SA15"):Activate()
     SAM.Blue.Turkey.CB22_S300       = GROUP:FindByName("SAM_Blue_Turkey_CB22_S300"):Activate()
     SAM.Blue.Turkey.DB30_S300       = GROUP:FindByName("SAM_Blue_Turkey_DB30_S300"):Activate()
     SAM.Blue.Turkey.IF25_S300       = GROUP:FindByName("SAM_Blue_Turkey_IF25_S300"):Activate()
@@ -597,118 +597,6 @@ RAT.ATCswitch = false
         end
 
 
-
-
-    -- M03 Interception Général
-
-        function M03_Intercept_General()
-
-            local CivilFlight = FLIGHTGROUP:New("M03_Neutral_General")
-
-            function CivilRTB()
-
-                local TimerVar = TIMER:New(
-                    function()
-                        if EnvProd == false then MessageToAll("OK, RTB ;(", 5) end
-                        FunRadio:NewGenericTransmission("M03_DEROUTEMENT.ogg", RadioGeneral):Broadcast()
-                        BASE:ScheduleOnce(17, function() CivilFlight:RTB(AIRBASE:FindByName(AIRBASE.Syria.Beirut_Rafic_Hariri)) end)
-                        MenuCivilRTB:Remove()
-                        SchedulerRefreshMenus:Stop()
-                    end
-                )
-                TimerVar:Start(1)
-
-            end
-
-            SchedulerRefreshMenus = SCHEDULER:New( nil,
-                function()
-                    if AIR.Red.Players:CountAlive() >= 1 then
-                        local zone_CivilFlight = ZONE_GROUP:New("Zone_CivilFlight", CivilFlight, 400)
-                        if AIR.Red.Players:AnyInZone(zone_CivilFlight) then
-                            if EnvProd == false then MessageToAll("In the zone", 5) end
-                            MenuCivilRTB = MENU_MISSION_COMMAND:New("RADIO : DEMANDER A ORAN-66 DE SE DÉROUTER VERS BEYROUTH", nil, CivilRTB)
-                        else
-                            if MenuCivilRTB then MenuCivilRTB:Remove() end
-                        end
-                    end
-                end, {}, 1, 5
-            )
-
-        end
-
-    -- M03 Récupération pilotes
-
-        function M03_PilotsFumis()
-
-            local ZoneFumiWest = ZONE:New("M03_Zone_FumiWest")
-            local ZoneFumiEast = ZONE:New("M03_Zone_FumiEast")
-
-            local ZoneFumiWest_Once = false
-            local ZoneFumiEast_Once = false
-
-            function RecupSmoke (ZoneFumi)
-                if AIR.Red.PlayersHelos:AnyInZone(ZoneFumiWest) and ZoneFumiWest_Once == false then
-                    ZoneFumiWest:GetCoordinate():SmokeGreen()
-                    ZoneFumiWest_Once = true
-                end
-                if AIR.Red.PlayersHelos:AnyInZone(ZoneFumiEast) and ZoneFumiEast_Once == false then
-                    ZoneFumiEast:GetCoordinate():SmokeGreen()
-                    ZoneFumiEast_Once = true
-                end
-                if ZoneFumiWest_Once == true and ZoneFumiEast_Once == true then
-                    SchedulerStartSmoke:Stop()
-                end
-            end
-
-            SchedulerStartSmoke = SCHEDULER:New(nil, RecupSmoke, {}, 1, 10)
-
-        end
-
-    -- M03 Gestion des Randoms Bleus
-
-        function M03_Randomize_BlueGroundAssets()
-
-            local RandomNumber = 19 -- Nombre de positions
-            local RandomPrefix = "M03_Blue_RDM_" -- Prefixe des groupes
-            local ApparitionChance = 75 -- %
-            local RandomName = nil
-            local RandomResult = 0
-            for i = 1, RandomNumber, 1 do
-                RandomName = RandomPrefix .. i
-                if EnvProd then
-                    RandomResult = math.random(100)
-                    if RandomResult <= ApparitionChance then
-                        GROUP:FindByName(RandomName):Activate()
-                        BASE:E(RandomName .. " Activated")
-                    end
-                else
-                    GROUP:FindByName(RandomName):Activate()
-                    BASE:E(RandomName .. " Activated")
-                end
-            end
-
-        end
-
-    -- M03 Attaque Blue
-
-        function M03_Blue_Attack()
-
-            local M03_Blue_Auftrag_AttackCAP = AUFTRAG:NewCAP(ZONE:New("M03_Zone_Blue_Attack"), 22000)
-            local M03_Blue_AttackCAP = FLIGHTGROUP:New("M03_Blue_AttackCAP")
-            M03_Blue_AttackCAP:AddMission(M03_Blue_Auftrag_AttackCAP)
-
-            local M03_TargetSEAD = GROUP:FindByName("M03_Red_SAM_AlQusayr")
-            local M03_Blue_Auftrag_AttackSEAD = AUFTRAG:NewBAI(M03_TargetSEAD, 7000):SetROT(ENUMS.ROT.EvadeFire)
-            local M03_Blue_AttackSEAD = FLIGHTGROUP:New("M03_Blue_AttackSEAD")
-            M03_Blue_AttackSEAD:AddMission(M03_Blue_Auftrag_AttackSEAD)
-
-            local M03_TargetRunway = AIRBASE:FindByName(AIRBASE.Syria.Al_Qusayr)
-            local M03_Blue_Auftrag_AttackRunway = AUFTRAG:NewBOMBRUNWAY(M03_TargetRunway, 4000)
-            local M03_Blue_AttackRunway = FLIGHTGROUP:New("M03_Blue_AttackRunway")
-            M03_Blue_AttackRunway:AddMission(M03_Blue_Auftrag_AttackRunway)
-
-        end
-
     -- Executions
 
         -- Configuration Generale
@@ -721,9 +609,5 @@ RAT.ATCswitch = false
             Spawn_EWR_Red()
             Auftrag_Red_Tankers()
 
-        -- M03 Exec
+        -- M04 Exec
 
-            M03_Randomize_BlueGroundAssets()
-            M03_PilotsFumis()
-            M03_Intercept_General()
-            BASE:ScheduleOnce(6600, function() M03_Blue_Attack() end)
