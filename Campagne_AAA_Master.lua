@@ -9,8 +9,6 @@ RAT.ATCswitch = false
 
     --[[ POINTS D'ATTENTION
 
-        CAP2 OTAN désactivée
-        CAPE TURQUEY désactivée
 
     ]]
 
@@ -58,22 +56,22 @@ RAT.ATCswitch = false
     COUNTRY.IsraelOTAN = {"USA", "ISRAEL"}
     COUNTRY.TurkeySyria = {"TURQEY", "CJTF_BLUE"}
 
-    local TANKER = {} -- Type : perche = 0, panier = 1
+    local TANKER = {} -- Type : perche = 1, panier = 0
     TANKER.IL78 = {}
     TANKER.KC130 = {}
     TANKER.KC135 = {}
     TANKER.KC135MPRS = {}
     TANKER.S3B = {}
 
-    TANKER.IL78.Type        = 1
+    TANKER.IL78.Type        = 0
     TANKER.IL78.Fuel        = 198416
-    TANKER.KC130.Type       = 1
+    TANKER.KC130.Type       = 0
     TANKER.KC130.Fuel       = 66139
-    TANKER.KC135.Type       = 0
+    TANKER.KC135.Type       = 1
     TANKER.KC135.Fuel       = 199959
-    TANKER.KC135MPRS.Type   = 1
+    TANKER.KC135MPRS.Type   = 0
     TANKER.KC135MPRS.Fuel   = 199959
-    TANKER.S3B.Type         = 1
+    TANKER.S3B.Type         = 0
     TANKER.S3B.Fuel         = 17225
 
     -- Border Zones
@@ -438,12 +436,12 @@ RAT.ATCswitch = false
             A2ADispatcherTurkey:SetSquadronCapRacetrack("Turkey CAPW", 40000, 40000, 46, 46, 40*60, 40*60)
             A2ADispatcherTurkey:SetSquadronCapInterval("Turkey CAPW", 1, 60, 120, 1)
             A2ADispatcherTurkey:SetSquadronGrouping("Turkey CAPW", 2)
-            -- -- CAP East
-            -- A2ADispatcherTurkey:SetSquadron("Turkey CAPE", AIRBASE.Syria.Incirlik, {"CAP_Blue_Turkey"}, 4)
-            -- A2ADispatcherTurkey:SetSquadronCap2("Turkey CAPE", 800, 2000, 2000, 10000, "BARO", ZoneCAPTurkeyE, 600, 600, 8000, 9000, "BARO")
-            -- A2ADispatcherTurkey:SetSquadronCapRacetrack("Turkey CAPE", 40000, 40000, 70, 70, 40*60, 40*60)
-            -- A2ADispatcherTurkey:SetSquadronCapInterval("Turkey CAPE", 1, 60, 120, 1)
-            -- A2ADispatcherTurkey:SetSquadronGrouping("Turkey CAPE", 2)
+            -- CAP East
+            A2ADispatcherTurkey:SetSquadron("Turkey CAPE", AIRBASE.Syria.Incirlik, {"CAP_Blue_Turkey"}, 4)
+            A2ADispatcherTurkey:SetSquadronCap2("Turkey CAPE", 800, 2000, 2000, 10000, "BARO", ZoneCAPTurkeyE, 600, 600, 8000, 9000, "BARO")
+            A2ADispatcherTurkey:SetSquadronCapRacetrack("Turkey CAPE", 40000, 40000, 70, 70, 40*60, 40*60)
+            A2ADispatcherTurkey:SetSquadronCapInterval("Turkey CAPE", 1, 60, 120, 1)
+            A2ADispatcherTurkey:SetSquadronGrouping("Turkey CAPE", 2)
             -- GCI
             A2ADispatcherTurkey:SetSquadron("Turkey GCI", AIRBASE.Syria.Incirlik, {"GCI_Blue_Turkey"}, 4)
             A2ADispatcherTurkey:SetSquadronGrouping("Turkey GCI", 2)
@@ -519,7 +517,7 @@ RAT.ATCswitch = false
         end
 
 ---------------------------------------------------------------------------------------------------
--- MISSION 03
+-- MISSION 04
 ---------------------------------------------------------------------------------------------------
 
     -- RED Ambiance
@@ -568,18 +566,18 @@ RAT.ATCswitch = false
                 {["Name"] = "Escort_Red_Tanker2", ["Callsign"] = CALLSIGN.Aircraft.Springfield, ["CallsignNumber"] = 2} -- ESCORT
             )
 
-            -- -- Shell KC135
-            -- LaunchTanker (
-            --     "TANKER_Red_KC135", -- GroupName
-            --     TANKER.KC135, -- TANKERTYPE
-            --     {["ZoneName"] = "ZONE_Tanker_Red-3", ["Altitude"] = 18000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
-            --     {["Frequency"] = RadioTanker3, ["Callsign"] = CALLSIGN.Tanker.Shell}, -- COMMS
-            --     AIRBASE.Syria.Damascus, -- HomeBase
-            --     {["Channel"] = 34, ["Morse"] = "SHL", ["Band"] = "Y"}, -- TACAN
-            --     10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
-            --     10, -- DepartureTime (s)
-            --     {["Name"] = "Escort_Red_Tanker3", ["Callsign"] = CALLSIGN.Aircraft.Springfield, ["CallsignNumber"] = 3} -- ESCORT
-            -- )
+            -- Shell KC135
+            LaunchTanker (
+                "TANKER_Red_KC135", -- GroupName
+                TANKER.KC135, -- TANKERTYPE
+                {["ZoneName"] = "ZONE_Tanker_Red-3", ["Altitude"] = 18000, ["Speed"] = 350, ["Heading"] = WIND.High, ["Leg"] = 20}, -- PATTERN
+                {["Frequency"] = RadioTanker3, ["Callsign"] = CALLSIGN.Tanker.Shell}, -- COMMS
+                AIRBASE.Syria.Damascus, -- HomeBase
+                {["Channel"] = 34, ["Morse"] = "SHL", ["Band"] = "Y"}, -- TACAN
+                10, -- FuelLow (%) Sert au calcul du carburant restant pour l'annonce radio
+                10, -- DepartureTime (s)
+                {["Name"] = "Escort_Red_Tanker3", ["Callsign"] = CALLSIGN.Aircraft.Springfield, ["CallsignNumber"] = 3} -- ESCORT
+            )
 
             -- -- Texaco KC135MPRS
             -- LaunchTanker (
@@ -611,3 +609,13 @@ RAT.ATCswitch = false
 
         -- M04 Exec
 
+
+        -- The target unit.
+        local Target=GROUP:FindByName("M04_Blue_SAM_Protect_Target")
+
+        -- Create a flightgroup.
+        local jf17=FLIGHTGROUP:New("Aerial-1")
+
+        -- SEAD mission.
+        local auftrag=AUFTRAG:NewSEAD(Target, 25000)
+        jf17:AddMission(auftrag)
