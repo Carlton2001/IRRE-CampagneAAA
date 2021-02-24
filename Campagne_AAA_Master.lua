@@ -599,23 +599,44 @@ RAT.ATCswitch = false
 
         -- Configuration Generale
 
-            CAPGCI_TURKEY()
-            CAPGCI_OTAN()
-            CAPGCI_ISRAEL()
-            CAPGCI_SYRIA()
-            CAPGCI_RED()
-            Spawn_EWR_Red()
-            Auftrag_Red_Tankers()
+            -- CAPGCI_TURKEY()
+            -- CAPGCI_OTAN()
+            -- CAPGCI_ISRAEL()
+            -- CAPGCI_SYRIA()
+            -- CAPGCI_RED()
+            -- Spawn_EWR_Red()
+            -- Auftrag_Red_Tankers()
 
         -- M04 Exec
 
+        -- Test Auftrag SEAD
+            -- The target unit.
+            local Target=GROUP:FindByName("M04_Blue_SAM_Protect_Target")
+            -- Create a flightgroup.
+            local jf17=FLIGHTGROUP:New("Aerial-1")
+            -- SEAD mission.
+            local auftrag=AUFTRAG:NewSEAD(Target, 25000)
+            jf17:AddMission(auftrag)
 
-        -- The target unit.
-        local Target=GROUP:FindByName("M04_Blue_SAM_Protect_Target")
+        -- Test Auftrag Strike
+            -- To get the scenery object of the bridge, we create a zone in the mission editor.
+            local TargetCoord=ZONE:New("M04_Research_Target"):GetCoordinate()
 
-        -- Create a flightgroup.
-        local jf17=FLIGHTGROUP:New("Aerial-1")
+            -- The bridge should be the closest scenery object.
+            local Bridge=TargetCoord:FindClosestScenery(100)
 
-        -- SEAD mission.
-        local auftrag=AUFTRAG:NewSEAD(Target, 25000)
-        jf17:AddMission(auftrag)
+            -- Create a strike mission.
+            local auftrag=AUFTRAG:NewSTRIKE(Bridge, 20000)
+
+            -- Assign Viggen group.
+            local viggen=FLIGHTGROUP:New("Aerial-2")
+            viggen:AddMission(auftrag)
+
+            -- Message sur Kill Target
+            EventHandler = EVENTHANDLER:New()
+            EventHandler:HandleEvent( EVENTS.Dead )
+            function EventHandler:OnEventDead( EventData )
+                if EventData.IniUnitName == 85426176 then
+                    MESSAGE:New("Target destroyed",10):ToAll()
+                end
+            end
